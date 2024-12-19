@@ -5,7 +5,7 @@ import {
   MOCK_TRACKS,
   MOCK_TRACK_FRAMES,
 } from "@/data/mock";
-import { useProject } from "@/data/queries";
+import { queryKeys, useProject } from "@/data/queries";
 import {
   type GenerationJob,
   PROJECT_PLACEHOLDER,
@@ -205,7 +205,7 @@ export default function VideoPreview() {
 
   const { data: project = PROJECT_PLACEHOLDER } = useProject(projectId);
   const { data: composition = EMPTY_COMPOSITION } = useQuery({
-    queryKey: ["preview", projectId],
+    queryKey: queryKeys.projectPreview(projectId),
     queryFn: async () => {
       const tracks = await db.tracks.tracksByProject(projectId);
       const frames = (

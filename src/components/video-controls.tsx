@@ -9,21 +9,9 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 
-type VideoControlsProps = {
-  onPlay?: () => void;
-  onPause?: () => void;
-  onSeekBackward?: () => void;
-  onSeekForward?: () => void;
-  onSeekToStart?: () => void;
-  onSeekToEnd?: () => void;
-};
+type VideoControlsProps = {};
 
-export function VideoControls({
-  onSeekBackward,
-  onSeekForward,
-  onSeekToStart,
-  onSeekToEnd,
-}: VideoControlsProps) {
+export function VideoControls({}: VideoControlsProps) {
   const player = useVideoProjectStore((s) => s.player);
   const playerState = useVideoProjectStore((s) => s.playerState);
   const handleTogglePlay = () => {
@@ -33,6 +21,22 @@ export function VideoControls({
     } else {
       player.play();
     }
+  };
+  const onSeekToStart = () => {
+    if (!player) return;
+    player.seekTo(0);
+  };
+  const onSeekToEnd = () => {
+    if (!player) return;
+    // player.seekTo(player.);
+  };
+  const onSeekBackward = () => {
+    if (!player) return;
+    // player.seekTo(player.getCurrentTime() - 5);
+  };
+  const onSeekForward = () => {
+    if (!player) return;
+    // player.seekTo(player.getCurrentTime() + 5);
   };
 
   return (

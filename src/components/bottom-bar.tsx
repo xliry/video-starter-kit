@@ -27,32 +27,8 @@ import {
 } from "./ui/dropdown-menu";
 import { VideoControls } from "./video-controls";
 import { TimelineRuler } from "./video/timeline";
-import { VideoTrackView } from "./video/track";
-
-type VideoTrackRowProps = {
-  data: VideoTrack;
-} & HTMLAttributes<HTMLDivElement>;
-
-function VideoTrackRow({ data, ...props }: VideoTrackRowProps) {
-  const { data: keyframes = [] } = useQuery({
-    queryKey: ["frames", data.id],
-    queryFn: () => db.keyFrames.keyFramesByTrack(data.id),
-  });
-  return (
-    <div className="flex flex-row gap-[2px]" {...props}>
-      {keyframes.map((frame) => (
-        <VideoTrackView
-          key={frame.id}
-          style={{
-            width: (frame.duration / 10 / 30).toFixed(2) + "%",
-          }}
-          track={data}
-          frame={frame}
-        />
-      ))}
-    </div>
-  );
-}
+import { VideoTrackRow, VideoTrackView } from "./video/track";
+import { queryKeys, refreshVideoCache } from "@/data/queries";
 
 export default function BottomBar() {
   const queryClient = useQueryClient();
@@ -111,14 +87,12 @@ export default function BottomBar() {
     },
     onSuccess: (data) => {
       if (!data) return;
-      queryClient.invalidateQueries({ queryKey: ["preview", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["tracks", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["frames", data.trackId] });
+      refreshVideoCache(queryClient, projectId);
     },
   });
 
   const { data: tracks = [] } = useQuery({
-    queryKey: ["tracks", projectId],
+    queryKey: queryKeys.projectTracks(projectId),
     queryFn: async () => {
       const result = await db.tracks.tracksByProject(projectId);
       return result.toSorted(
@@ -213,7 +187,9 @@ export default function BottomBar() {
               <VideoTrackRow
                 key={track.id}
                 data={track}
-                style={{ minWidth: minTrackWidth }}
+                style={{
+                  minWidth: minTrackWidth,
+                }}
               />
             ))}
           </div>

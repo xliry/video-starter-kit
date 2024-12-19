@@ -96,6 +96,10 @@ export const db = {
         id: crypto.randomUUID(),
       });
     },
+    async delete(id: string) {
+      const db = await open();
+      return db.delete("keyFrames", id);
+    },
   },
 
   jobs: {
