@@ -1,6 +1,69 @@
-import { clsx, type ClassValue } from "clsx";
+import type { VideoTrack } from "@/data/schema";
+import { LAST_PROJECT_ID_KEY } from "@/data/store";
+import { type ClassValue, clsx } from "clsx";
+import { ImageIcon, MicIcon, MusicIcon, VideoIcon } from "lucide-react";
+import type { FunctionComponent } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function extractJson<T>(raw: string): T {
+  const json = raw.replace("```json", "").replace("```", "");
+  return JSON.parse(json);
+}
+
+export function rememberLastProjectId(projectId: string) {
+  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    document.cookie = `${LAST_PROJECT_ID_KEY}=${projectId}; max-age=31536000; path=/`;
+  }
+}
+
+export const trackIcons: Record<
+  VideoTrack["type"] | "image",
+  FunctionComponent
+> = {
+  video: VideoIcon,
+  music: MusicIcon,
+  voiceover: MicIcon,
+  image: ImageIcon,
+};
+
+export function resolveDuration(data: any): number | null {
+  if (!data) return null;
+  if ("seconds_total" in data) {
+    return data.seconds_total * 1000;
+  }
+  return null;
+}
+
+/**
+ * Depending on the output type of the job, the URL of the audio/image/video
+ * might be represented by different properties. This utility function resolves
+ * the URL of the media based on the output data.
+ */
+export function resolveMediaUrl(data: any): string | null {
+  if (!data) return null;
+  if (
+    "images" in data &&
+    Array.isArray(data.images) &&
+    data.images.length > 0
+  ) {
+    return data.images[0].url;
+  }
+  const fileProperties = {
+    image: 1,
+    video: 1,
+    audio: 1,
+    audio_file: 1,
+    audio_url: 1,
+  };
+  const property = Object.keys(data).find(
+    (key) => key in fileProperties && "url" in data[key],
+  );
+  if (property) {
+    return data[property].url;
+  }
+  return null;
 }
