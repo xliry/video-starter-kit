@@ -94,12 +94,12 @@ export function VoiceSelector({
   const [open, setOpen] = useState(false);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           {...props}
-          className={cn("w-[200px] justify-between", className)}
+          className={cn("max-w-fit justify-between", className)}
           role="combobox"
           aria-expanded={open}
         >
@@ -107,10 +107,10 @@ export function VoiceSelector({
           <ChevronsUpDownIcon className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-fit p-0" align="start">
         <Command>
           <CommandInput placeholder="Search voices..." className="h-9" />
-          <CommandList>
+          <CommandList className="overflow-y-scroll">
             <CommandEmpty>No voice found</CommandEmpty>
             <CommandGroup>
               {voices.map((voice) => (
