@@ -140,5 +140,36 @@ export const db = {
       await tx.done;
       return result;
     },
+    async delete(id: string) {
+      const db = await open();
+      const job: GenerationJob | null = await db.get("jobs", id);
+      if (!job) return;
+      // Delete associated keyframes
+      const tracks = await db.getAllFromIndex(
+        "tracks",
+        "by_projectId",
+        job.projectId,
+      );
+      const trackIds = tracks.map((track) => track.id);
+      const frames = (
+        await Promise.all(
+          trackIds.map(
+            (trackId) =>
+              db.getAllFromIndex("keyFrames", "by_trackId", trackId) as Promise<
+                VideoKeyFrame[]
+              >,
+          ),
+        )
+      )
+        .flatMap((f) => f)
+        .filter((f) => f.data.jobId === id)
+        .map((f) => f.id);
+      const tx = db.transaction(["jobs", "keyFrames"], "readwrite");
+      await Promise.all(
+        frames.map((id) => tx.objectStore("keyFrames").delete(id)),
+      );
+      await tx.objectStore("jobs").delete(id);
+      await tx.done;
+    },
   },
 } as const;

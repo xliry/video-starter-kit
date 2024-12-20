@@ -17,6 +17,7 @@ interface VideoProjectProps {
   playerState: "playing" | "paused";
   generateDialogOpen: boolean;
   generateMediaType: MediaType;
+  selectedMediaId: string | null;
 }
 
 interface VideoProjectState extends VideoProjectProps {
@@ -28,6 +29,7 @@ interface VideoProjectState extends VideoProjectProps {
   setGenerateMediaType: (mediaType: MediaType) => void;
   openGenerateDialog: (mediaType?: MediaType) => void;
   closeGenerateDialog: () => void;
+  setSelectedMediaId: (mediaId: string | null) => void;
 }
 
 const DEFAULT_PROPS: VideoProjectProps = {
@@ -38,6 +40,7 @@ const DEFAULT_PROPS: VideoProjectProps = {
   playerState: "paused",
   generateDialogOpen: false,
   generateMediaType: "image",
+  selectedMediaId: null,
 };
 
 type VideoProjectStore = ReturnType<typeof createVideoProjectStore>;
@@ -64,6 +67,8 @@ export const createVideoProjectStore = (
         generateMediaType: mediaType ?? state().generateMediaType,
       }),
     closeGenerateDialog: () => set({ generateDialogOpen: false }),
+    setSelectedMediaId: (selectedMediaId: string | null) =>
+      set({ selectedMediaId }),
   }));
 };
 

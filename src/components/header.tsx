@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { InfoIcon } from "lucide-react";
 import { Logo } from "./logo";
-import { Badge } from "./ui/badge";
 
 export default function Header() {
   return (
@@ -10,13 +8,6 @@ export default function Header() {
         <Logo />
       </h1>
       <nav className="flex flex-row items-center justify-end gap-1">
-        <Badge
-          variant="secondary"
-          className="bg-sky-700/50 text-sky-300 pointer-events-auto cursor-default hover:bg-sky-700/60"
-        >
-          <InfoIcon className="w-3 h-3 mr-1" />
-          demo
-        </Badge>
         <Button variant="ghost" size="sm" asChild>
           <a href="https://fal.ai" target="_blank" rel="noopener noreferrer">
             fal.ai

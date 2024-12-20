@@ -38,6 +38,7 @@ import { Textarea } from "./ui/textarea";
 import { WithTooltip } from "./ui/tooltip";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { VoiceSelector } from "./playht/voice-selector";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -77,8 +78,11 @@ export function GenerateDialog({
   onOpenChange,
   ...props
 }: GenerateDialogProps) {
+  // TODO: improve field per model
   const [prompt, setPrompt] = useState("");
   const [duration, setDuration] = useState(30);
+  const [voice, setVoice] = useState("");
+
   const projectId = useProjectId();
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
   const closeGenerateDialog = useVideoProjectStore(
@@ -132,8 +136,8 @@ export function GenerateDialog({
   const input = {
     prompt: prompt,
     image_size: {
-      width: 1028,
-      height: 720,
+      width: 1920,
+      height: 1080,
     },
     aspect_ratio: "16:9",
     seconds_total: endpointId === "fal-ai/stable-audio" ? duration : undefined,
@@ -243,6 +247,9 @@ export function GenerateDialog({
                 <span>s</span>
               </div>
             )}
+            {endpointId === "fal-ai/playht/tts/v3" && (
+              <VoiceSelector value={voice} onValueChange={setVoice} />
+            )}
             {/* <Popover>
               <PopoverTrigger asChild>
                 <Button size="sm" variant="secondary">
@@ -261,7 +268,6 @@ export function GenerateDialog({
           <div className="flex flex-row gap-2">
             <WithTooltip tooltip="Enhance your prompt with AI-powered suggestions.">
               <Button
-                size="sm"
                 variant="secondary"
                 disabled={enhance.isPending}
                 onClick={() => enhance.mutate()}
@@ -275,7 +281,6 @@ export function GenerateDialog({
               </Button>
             </WithTooltip>
             <Button
-              size="sm"
               disabled={enhance.isPending || createJob.isPending}
               onClick={handleOnGenerate}
             >

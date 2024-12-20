@@ -1,17 +1,13 @@
 "use client";
 
-import { db } from "@/data/db";
 import { useProjectUpdater } from "@/data/mutations";
 import { useProject, useProjectJobs } from "@/data/queries";
 import { PROJECT_PLACEHOLDER } from "@/data/schema";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DownloadIcon, FolderOpenIcon, ImagePlusIcon } from "lucide-react";
-import { useState } from "react";
 import { JobsPanel } from "./jobs-panel";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 
 export default function RightPanel() {
@@ -104,11 +100,7 @@ export default function RightPanel() {
           </div>
         )}
         {jobs.length > 0 && (
-          <JobsPanel
-            jobs={jobs}
-            className="overflow-y-auto"
-            // onJobClick={(job) => console.log(job)}
-          />
+          <JobsPanel jobs={jobs} className="overflow-y-auto" />
         )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent via-background via-60% h-8 pointer-events-none" />
       </div>

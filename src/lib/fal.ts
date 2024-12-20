@@ -86,6 +86,13 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
     category: "music",
   },
   {
+    endpointId: "fal-ai/playht/tts/v3",
+    label: "PlayHT TTS v3",
+    description: "Fluent and faithful speech with flow matching",
+    cost: "",
+    category: "voiceover",
+  },
+  {
     endpointId: "fal-ai/f5-tts",
     label: "F5 TTS",
     description: "Fluent and faithful speech with flow matching",

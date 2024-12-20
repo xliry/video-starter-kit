@@ -13,6 +13,9 @@ import { useRef } from "react";
 import { useStore } from "zustand";
 import { GenerateDialog } from "./generate-dialog";
 import { ProjectDialog } from "./project-dialog";
+import { MediaGallerySheet } from "./media-gallery";
+import { ToastProvider } from "./ui/toast";
+import { Toaster } from "./ui/toaster";
 
 type AppProps = {
   projectId: string;
@@ -31,22 +34,40 @@ export function App({ projectId }: AppProps) {
     projectStore,
     (s) => s.generateDialogOpen,
   );
+  const selectedMediaId = useStore(projectStore, (s) => s.selectedMediaId);
+  const setSelectedMediaId = useStore(
+    projectStore,
+    (s) => s.setSelectedMediaId,
+  );
+  const handleOnSheetOpenChange = (open: boolean) => {
+    if (!open) {
+      setSelectedMediaId(null);
+    }
+  };
   return (
-    <QueryClientProvider client={queryClient}>
-      <VideoProjectStoreContext.Provider value={projectStore}>
-        <div className="flex flex-col h-screen bg-background">
-          <Header />
-          <main className="flex overflow-hidden h-full">
-            <div className="flex flex-col flex-1">
-              <VideoPreview />
-              <BottomBar />
-            </div>
-            <RightPanel />
-          </main>
-        </div>
-        <ProjectDialog open={projectDialogOpen} />
-        <GenerateDialog open={generateDialogOpen} />
-      </VideoProjectStoreContext.Provider>
-    </QueryClientProvider>
+    <ToastProvider>
+      <QueryClientProvider client={queryClient}>
+        <VideoProjectStoreContext.Provider value={projectStore}>
+          <div className="flex flex-col h-screen bg-background">
+            <Header />
+            <main className="flex overflow-hidden h-full">
+              <div className="flex flex-col flex-1">
+                <VideoPreview />
+                <BottomBar />
+              </div>
+              <RightPanel />
+            </main>
+          </div>
+          <Toaster />
+          <ProjectDialog open={projectDialogOpen} />
+          <GenerateDialog open={generateDialogOpen} />
+          <MediaGallerySheet
+            open={selectedMediaId !== null}
+            onOpenChange={handleOnSheetOpenChange}
+            selectedMediaId={selectedMediaId ?? ""}
+          />
+        </VideoProjectStoreContext.Provider>
+      </QueryClientProvider>
+    </ToastProvider>
   );
 }
