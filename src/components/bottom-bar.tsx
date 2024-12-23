@@ -34,7 +34,7 @@ export default function BottomBar() {
   const queryClient = useQueryClient();
   const projectId = useProjectId();
   const playerCurrentTimestamp = useVideoProjectStore(
-    (s) => s.playerCurrentTimestamp,
+    (s) => s.playerCurrentTimestamp
   );
   const formattedTimestamp =
     (playerCurrentTimestamp < 10 ? "0" : "") +
@@ -70,7 +70,7 @@ export default function BottomBar() {
       const keyframes = await db.keyFrames.keyFramesByTrack(track.id);
       const duration = keyframes.reduce(
         (acc, frame) => acc + frame.duration,
-        0,
+        0
       );
       const newId = await db.keyFrames.create({
         trackId: track.id,
@@ -97,7 +97,7 @@ export default function BottomBar() {
     queryFn: async () => {
       const result = await db.tracks.tracksByProject(projectId);
       return result.toSorted(
-        (a, b) => TRACK_TYPE_ORDER[a.type] - TRACK_TYPE_ORDER[b.type],
+        (a, b) => TRACK_TYPE_ORDER[a.type] - TRACK_TYPE_ORDER[b.type]
       );
     },
   });
@@ -169,7 +169,7 @@ export default function BottomBar() {
           "min-h-64 max-h-72 h-full flex flex-row bg-background-light overflow-y-scroll transition-colors",
           {
             "bg-white/5": dragOverTracks,
-          },
+          }
         )}
         onDragOver={handleOnDragOver}
         onDragLeave={() => setDragOverTracks(false)}
@@ -183,7 +183,7 @@ export default function BottomBar() {
             }}
           ></div>
           <TimelineRuler className="z-30 pointer-events-none" />
-          <div className="flex flex-col h-full mx-4 mt-10 gap-2 z-[31] pb-2">
+          <div className="flex timeline-container flex-col h-full mx-4 mt-10 gap-2 z-[31] pb-2">
             {tracks.map((track) => (
               <VideoTrackRow
                 key={track.id}
