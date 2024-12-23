@@ -20,7 +20,7 @@ function open() {
       keyFrameStore.createIndex("by_trackId", "trackId");
 
       const jobStore = db.createObjectStore("jobs", { keyPath: "id" });
-      jobStore.createIndex("by_projectId", ["projectId", "createdAt"]);
+      jobStore.createIndex("by_projectId", "projectId");
     },
   });
 }
@@ -114,6 +114,7 @@ export const db = {
         "by_projectId",
         projectId,
       );
+
       return results.toSorted((a, b) => b.createdAt - a.createdAt);
     },
     async create(job: Omit<GenerationJob, "id">) {
