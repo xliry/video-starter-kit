@@ -85,7 +85,7 @@ export const db = {
       const result = await db.getAllFromIndex(
         "keyFrames",
         "by_trackId",
-        trackId,
+        trackId
       );
       return result.toSorted((a, b) => a.timestamp - b.timestamp);
     },
@@ -94,6 +94,17 @@ export const db = {
       return db.put("keyFrames", {
         ...keyFrame,
         id: crypto.randomUUID(),
+      });
+    },
+    async update(id: string, keyFrame: Partial<VideoKeyFrame>) {
+      const db = await open();
+      const existing = await db.get("keyFrames", id);
+      if (!existing) return;
+
+      return db.put("keyFrames", {
+        ...existing,
+        ...keyFrame,
+        id,
       });
     },
     async delete(id: string) {
@@ -112,7 +123,7 @@ export const db = {
       const results = await db.getAllFromIndex(
         "jobs",
         "by_projectId",
-        projectId,
+        projectId
       );
 
       return results.toSorted((a, b) => b.createdAt - a.createdAt);
@@ -149,7 +160,7 @@ export const db = {
       const tracks = await db.getAllFromIndex(
         "tracks",
         "by_projectId",
-        job.projectId,
+        job.projectId
       );
       const trackIds = tracks.map((track) => track.id);
       const frames = (
@@ -158,8 +169,8 @@ export const db = {
             (trackId) =>
               db.getAllFromIndex("keyFrames", "by_trackId", trackId) as Promise<
                 VideoKeyFrame[]
-              >,
-          ),
+              >
+          )
         )
       )
         .flatMap((f) => f)
@@ -167,7 +178,7 @@ export const db = {
         .map((f) => f.id);
       const tx = db.transaction(["jobs", "keyFrames"], "readwrite");
       await Promise.all(
-        frames.map((id) => tx.objectStore("keyFrames").delete(id)),
+        frames.map((id) => tx.objectStore("keyFrames").delete(id))
       );
       await tx.objectStore("jobs").delete(id);
       await tx.done;
