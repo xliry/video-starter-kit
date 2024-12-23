@@ -31,9 +31,13 @@ export const trackIcons: Record<
 };
 
 export function resolveDuration(data: any): number | null {
+  console.log(data);
   if (!data) return null;
   if ("seconds_total" in data) {
     return data.seconds_total * 1000;
+  }
+  if ("audio" in data && "duration" in data.audio) {
+    return data.audio.duration * 1000;
   }
   return null;
 }

@@ -21,9 +21,8 @@ type AppProps = {
   projectId: string;
 };
 
-const queryClient = new QueryClient();
-
 export function App({ projectId }: AppProps) {
+  const queryClient = useRef(new QueryClient()).current;
   const projectStore = useRef(
     createVideoProjectStore({
       projectId,

@@ -18,6 +18,7 @@ interface VideoProjectProps {
   generateDialogOpen: boolean;
   generateMediaType: MediaType;
   selectedMediaId: string | null;
+  selectedKeyframes: string[];
 }
 
 interface VideoProjectState extends VideoProjectProps {
@@ -30,6 +31,7 @@ interface VideoProjectState extends VideoProjectProps {
   openGenerateDialog: (mediaType?: MediaType) => void;
   closeGenerateDialog: () => void;
   setSelectedMediaId: (mediaId: string | null) => void;
+  selectKeyframe: (frameId: string) => void;
 }
 
 const DEFAULT_PROPS: VideoProjectProps = {
@@ -41,6 +43,7 @@ const DEFAULT_PROPS: VideoProjectProps = {
   generateDialogOpen: false,
   generateMediaType: "image",
   selectedMediaId: null,
+  selectedKeyframes: [],
 };
 
 type VideoProjectStore = ReturnType<typeof createVideoProjectStore>;
@@ -69,6 +72,16 @@ export const createVideoProjectStore = (
     closeGenerateDialog: () => set({ generateDialogOpen: false }),
     setSelectedMediaId: (selectedMediaId: string | null) =>
       set({ selectedMediaId }),
+    selectKeyframe: (frameId: string) => {
+      const selected = state().selectedKeyframes;
+      if (selected.includes(frameId)) {
+        set({
+          selectedKeyframes: selected.filter((id) => id !== frameId),
+        });
+      } else {
+        set({ selectedKeyframes: [...selected, frameId] });
+      }
+    },
   }));
 };
 

@@ -4,8 +4,9 @@ import type { VideoKeyFrame, VideoTrack } from "@/data/schema";
 import { cn, trackIcons } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
-import { type HTMLAttributes, createElement } from "react";
+import { type HTMLAttributes, MouseEventHandler, createElement } from "react";
 import { WithTooltip } from "../ui/tooltip";
+import { useVideoProjectStore } from "@/data/store";
 
 type VideoTrackRowProps = {
   data: VideoTrack;
@@ -58,18 +59,33 @@ export function VideoTrackView({
   const handleOnDelete = () => {
     deleteKeyframe.mutate();
   };
+
+  const isSelected = useVideoProjectStore((state) =>
+    state.selectedKeyframes.includes(frame.id),
+  );
+  const selectKeyframe = useVideoProjectStore((state) => state.selectKeyframe);
+  const handleOnClick: MouseEventHandler = (e) => {
+    if (e.detail > 1) {
+      return;
+    }
+    selectKeyframe(frame.id);
+  };
   return (
     <div
       className={cn(
-        "flex flex-col rounded overflow-hidden group",
+        "flex flex-col rounded overflow-hidden group opacity-90",
         // https://tailwindcss.com/docs/content-configuration#dynamic-class-names
         {
           "bg-teal-500 dark:bg-teal-600": track.type === "video",
           "bg-sky-500 dark:bg-sky-600": track.type === "music",
           "bg-violet-500 dark:bg-violet-600": track.type === "voiceover",
+          "opacity-100": isSelected,
         },
         className,
       )}
+      role="checkbox"
+      aria-checked={isSelected}
+      onClick={handleOnClick}
       {...props}
     >
       <div className="px-2 py-0.5 bg-black/10 flex flex-row items-center">

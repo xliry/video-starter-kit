@@ -135,12 +135,12 @@ export function GenerateDialog({
   // TODO improve model-specific parameters
   const input = {
     prompt: prompt,
-    image_size: {
-      width: 1920,
-      height: 1080,
-    },
-    aspect_ratio: "16:9",
+    image_size:
+      mediaType === "image" ? { width: 1920, height: 1080 } : undefined,
+    aspect_ratio: mediaType === "video" ? "16:9" : undefined,
     seconds_total: endpointId === "fal-ai/stable-audio" ? duration : undefined,
+    voice: endpointId === "fal-ai/playht/tts/v3" ? voice : undefined,
+    input: endpointId === "fal-ai/playht/tts/v3" ? prompt : undefined,
   };
   const extraInput =
     endpointId === "fal-ai/f5-tts"

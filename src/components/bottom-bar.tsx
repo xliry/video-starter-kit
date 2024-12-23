@@ -81,7 +81,8 @@ export default function BottomBar() {
           url: job.input?.image_url?.url,
         },
         timestamp: duration ? duration + 1 : 0,
-        duration: resolveDuration(job.input) ?? 5000,
+        duration:
+          resolveDuration(job.input) ?? resolveDuration(job.output) ?? 5000,
       });
       return db.keyFrames.find(newId.toString());
     },
