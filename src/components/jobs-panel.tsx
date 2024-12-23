@@ -93,7 +93,7 @@ export function JobItem({ data, className, onOpen, ...props }: JobItemProps) {
     <div
       className={cn(
         "flex items-start space-x-2 py-2 px-4 hover:bg-accent transition-all",
-        className,
+        className
       )}
       {...props}
       draggable={data.status === "completed"}
@@ -170,23 +170,30 @@ export function JobItem({ data, className, onOpen, ...props }: JobItemProps) {
 
 type JobsPanelProps = {
   jobs: GenerationJob[];
+  mediaType: string;
 } & HTMLAttributes<HTMLDivElement>;
 
-export function JobsPanel({ className, jobs }: JobsPanelProps) {
+export function JobsPanel({ className, jobs, mediaType }: JobsPanelProps) {
   const setSelectedMediaId = useVideoProjectStore((s) => s.setSelectedMediaId);
   const handleOnOpen = (data: GenerationJob) => {
     setSelectedMediaId(data.id);
   };
+
   return (
     <div className={cn("flex flex-col overflow-hidden", className)}>
-      {jobs.map((job, index) => (
-        <Fragment key={job.id}>
-          <JobItem data={job} onOpen={handleOnOpen} />
-          {index < jobs.length - 1 && (
-            <Separator className="px-2 ms-20 max-w-full" />
-          )}
-        </Fragment>
-      ))}
+      {jobs
+        .filter((job) => {
+          if (mediaType === "all") return true;
+          return job.mediaType === mediaType;
+        })
+        .map((job, index) => (
+          <Fragment key={job.id}>
+            <JobItem data={job} onOpen={handleOnOpen} />
+            {index < jobs.length - 1 && (
+              <Separator className="px-2 ms-20 max-w-full" />
+            )}
+          </Fragment>
+        ))}
     </div>
   );
 }
