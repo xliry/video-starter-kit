@@ -1,12 +1,12 @@
 import { db } from "@/data/db";
-import { refreshVideoCache } from "@/data/queries";
+import { refreshVideoCache, useProjectJobs } from "@/data/queries";
 import type { VideoKeyFrame, VideoTrack } from "@/data/schema";
 import { cn, trackIcons } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
 import { type HTMLAttributes, MouseEventHandler, createElement } from "react";
 import { WithTooltip } from "../ui/tooltip";
-import { useVideoProjectStore } from "@/data/store";
+import { useProjectId, useVideoProjectStore } from "@/data/store";
 
 type VideoTrackRowProps = {
   data: VideoTrack;
@@ -61,7 +61,7 @@ export function VideoTrackView({
   };
 
   const isSelected = useVideoProjectStore((state) =>
-    state.selectedKeyframes.includes(frame.id),
+    state.selectedKeyframes.includes(frame.id)
   );
   const selectKeyframe = useVideoProjectStore((state) => state.selectKeyframe);
   const handleOnClick: MouseEventHandler = (e) => {
@@ -70,6 +70,13 @@ export function VideoTrackView({
     }
     selectKeyframe(frame.id);
   };
+
+  const projectId = useProjectId();
+  const { data: jobs = [] } = useProjectJobs(projectId);
+
+  const imageUrl = jobs.find((s) => s.id === frame.data.jobId)?.output
+    ?.images?.[0]?.url;
+
   return (
     <div
       className={cn(
@@ -81,7 +88,7 @@ export function VideoTrackView({
           "bg-violet-500 dark:bg-violet-600": track.type === "voiceover",
           "opacity-100": isSelected,
         },
-        className,
+        className
       )}
       role="checkbox"
       aria-checked={isSelected}
@@ -108,7 +115,13 @@ export function VideoTrackView({
           </div>
         </div>
       </div>
-      <div className="p-px flex-1"></div>
+      <div className="p-px flex-1 relative">
+        <img
+          src={imageUrl}
+          className="rounded-md h-8 m-1 absolute top-0 left-0"
+          alt=""
+        />
+      </div>
     </div>
   );
 }

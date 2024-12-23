@@ -52,7 +52,7 @@ function ModelEndpointPicker({
   const endpoints = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.filter((endpoint) => endpoint.category === mediaType),
-    [mediaType],
+    [mediaType]
   );
   return (
     <Select {...props}>
@@ -80,18 +80,20 @@ export function GenerateDialog({
 }: GenerateDialogProps) {
   // TODO: improve field per model
   const [prompt, setPrompt] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [duration, setDuration] = useState(30);
   const [voice, setVoice] = useState("");
 
   const projectId = useProjectId();
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
   const closeGenerateDialog = useVideoProjectStore(
-    (s) => s.closeGenerateDialog,
+    (s) => s.closeGenerateDialog
   );
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       closeGenerateDialog();
       setPrompt("");
+      setImage(null);
       return;
     }
     onOpenChange?.(isOpen);
@@ -121,20 +123,40 @@ export function GenerateDialog({
   const setMediaType = useVideoProjectStore((s) => s.setGenerateMediaType);
   const [endpointId, setEndpointId] = useState<string>(() => {
     const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType,
+      (endpoint) => endpoint.category === mediaType
     );
     return endpoint?.endpointId ?? AVAILABLE_ENDPOINTS[0].endpointId;
   });
   const handleMediaTypeChange = (mediaType: string) => {
     setMediaType(mediaType as MediaType);
     const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType,
+      (endpoint) => endpoint.category === mediaType
     );
+
+    if (
+      (mediaType === "video" &&
+        endpoint?.endpointId === "fal-ai/hunyuan-video") ||
+      mediaType !== "video"
+    ) {
+      setImage(null);
+    }
+
     setEndpointId(endpoint?.endpointId ?? AVAILABLE_ENDPOINTS[0].endpointId);
   };
   // TODO improve model-specific parameters
-  const input = {
+  type InputType = {
+    prompt: string;
+    image_url?: File;
+    image_size?: { width: number; height: number };
+    aspect_ratio?: string;
+    seconds_total?: number;
+    voice?: string;
+    input?: string;
+  };
+
+  const input: InputType = {
     prompt: prompt,
+    image_url: undefined,
     image_size:
       mediaType === "image" ? { width: 1920, height: 1080 } : undefined,
     aspect_ratio: mediaType === "video" ? "16:9" : undefined,
@@ -142,6 +164,11 @@ export function GenerateDialog({
     voice: endpointId === "fal-ai/playht/tts/v3" ? voice : undefined,
     input: endpointId === "fal-ai/playht/tts/v3" ? prompt : undefined,
   };
+
+  if (image) {
+    input["image_url"] = image;
+  }
+
   const extraInput =
     endpointId === "fal-ai/f5-tts"
       ? {
@@ -155,7 +182,10 @@ export function GenerateDialog({
       : {};
   const createJob = useJobCreator({
     projectId,
-    endpointId,
+    endpointId:
+      image && mediaType === "video"
+        ? `${endpointId}/image-to-video`
+        : endpointId,
     mediaType,
     input: {
       ...input,
@@ -221,7 +251,7 @@ export function GenerateDialog({
             />
           </div>
         </DialogHeader>
-        <div className="">
+        <div className="flex items-center gap-2">
           <Textarea
             className="text-base placeholder:text-base w-full resize-none"
             placeholder="Imagine..."
@@ -229,6 +259,44 @@ export function GenerateDialog({
             rows={3}
             onChange={(e) => setPrompt(e.target.value)}
           />
+
+          {mediaType === "video" && endpointId !== "fal-ai/hunyuan-video" && (
+            <div className="">
+              <Input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="image-upload"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setImage(file);
+                }}
+              />
+              {!image && (
+                <label
+                  htmlFor="image-upload"
+                  className="cursor-pointer min-h-[70px] flex flex-col items-center justify-center border border-dashed border-neutral-700 rounded-md p-4"
+                >
+                  <span className="text-gray-500 text-sm text-center">
+                    Select an image
+                  </span>
+                </label>
+              )}
+              {image && (
+                <label
+                  htmlFor="image-upload"
+                  className="cursor-pointer max-h-[70px] flex flex-col items-center justify-center border border-dashed border-neutral-700 rounded-md"
+                >
+                  <img
+                    id="image-preview"
+                    src={image ? URL.createObjectURL(image) : ""}
+                    className="h-[70px]"
+                    alt="Image Preview"
+                  />
+                </label>
+              )}
+            </div>
+          )}
         </div>
         <DialogFooter className="flex flex-row gap-2 items-end">
           <div className="flex-1 flex flex-row gap-2">
