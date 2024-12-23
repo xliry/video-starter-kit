@@ -4,21 +4,39 @@ import { useProjectUpdater } from "@/data/mutations";
 import { useProject, useProjectJobs } from "@/data/queries";
 import { PROJECT_PLACEHOLDER } from "@/data/schema";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
-import { DownloadIcon, FolderOpenIcon, ImagePlusIcon } from "lucide-react";
+import {
+  ChevronDown,
+  FilmIcon,
+  FolderOpenIcon,
+  GalleryVerticalIcon,
+  ImageIcon,
+  ImagePlusIcon,
+  ListPlusIcon,
+  MicIcon,
+  MusicIcon,
+} from "lucide-react";
 import { JobsPanel } from "./jobs-panel";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useState } from "react";
 
 export default function RightPanel() {
   const projectId = useProjectId();
   // const [projectTitle, setProjectTitle] = useState("");
   const { data: project = PROJECT_PLACEHOLDER } = useProject(projectId);
   const projectUpdate = useProjectUpdater(projectId);
+  const [mediaType, setMediaType] = useState("all");
 
   const { data: jobs = [], isLoading } = useProjectJobs(projectId);
   const setProjectDialogOpen = useVideoProjectStore(
-    (s) => s.setProjectDialogOpen,
+    (s) => s.setProjectDialogOpen
   );
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
 
@@ -99,8 +117,60 @@ export default function RightPanel() {
             </Button>
           </div>
         )}
+        <div className="flex justify-end pt-4 px-4 border-t border-border">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="px-2">
+                <ListPlusIcon className="w-4 h-4 opacity-50" />
+                Media Type
+                <ChevronDown className="w-4 h-4 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start">
+              <DropdownMenuItem
+                className="text-sm"
+                onClick={() => setMediaType("all")}
+              >
+                <GalleryVerticalIcon className="w-4 h-4 opacity-50" />
+                All
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-sm"
+                onClick={() => setMediaType("image")}
+              >
+                <ImageIcon className="w-4 h-4 opacity-50" />
+                Image
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-sm"
+                onClick={() => setMediaType("music")}
+              >
+                <MusicIcon className="w-4 h-4 opacity-50" />
+                Music
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-sm"
+                onClick={() => setMediaType("voiceover")}
+              >
+                <MicIcon className="w-4 h-4 opacity-50" />
+                Voiceover
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-sm"
+                onClick={() => setMediaType("video")}
+              >
+                <FilmIcon className="w-4 h-4 opacity-50" />
+                Video
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         {jobs.length > 0 && (
-          <JobsPanel jobs={jobs} className="overflow-y-auto" />
+          <JobsPanel
+            jobs={jobs}
+            mediaType={mediaType}
+            className="overflow-y-auto"
+          />
         )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent via-background via-60% h-8 pointer-events-none" />
       </div>
