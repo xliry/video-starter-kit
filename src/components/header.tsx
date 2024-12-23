@@ -15,7 +15,7 @@ export default function Header() {
         </Button>
         <Button variant="ghost" size="sm" asChild>
           <a
-            href="https://github.com/fal-ai/fal-video-studio"
+            href="https://github.com/fal-ai-community/video-starter-kit"
             target="_blank"
             rel="noopener noreferrer"
           >
