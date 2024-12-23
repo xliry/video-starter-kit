@@ -61,7 +61,7 @@ export function VideoTrackView({
   };
 
   const isSelected = useVideoProjectStore((state) =>
-    state.selectedKeyframes.includes(frame.id)
+    state.selectedKeyframes.includes(frame.id),
   );
   const selectKeyframe = useVideoProjectStore((state) => state.selectKeyframe);
   const handleOnClick: MouseEventHandler = (e) => {
@@ -88,7 +88,7 @@ export function VideoTrackView({
           "bg-violet-500 dark:bg-violet-600": track.type === "voiceover",
           "opacity-100": isSelected,
         },
-        className
+        className,
       )}
       role="checkbox"
       aria-checked={isSelected}

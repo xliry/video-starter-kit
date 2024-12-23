@@ -1,10 +1,4 @@
 import { db } from "@/data/db";
-import {
-  MOCK_JOBS,
-  MOCK_PROJECT,
-  MOCK_TRACKS,
-  MOCK_TRACK_FRAMES,
-} from "@/data/mock";
 import { queryKeys, useProject } from "@/data/queries";
 import {
   type GenerationJob,
@@ -31,6 +25,7 @@ import {
 import { throttle } from "throttle-debounce";
 import { Button } from "./ui/button";
 import { DownloadIcon } from "lucide-react";
+import { fal } from "@/lib/fal";
 
 interface VideoCompositionProps {
   project: VideoProject;
@@ -316,14 +311,12 @@ export default function VideoPreview() {
       if (videoData.length === 0) {
         throw new Error("No tracks to export");
       }
-      const response = await fetch("/api/video/export", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const { data } = await fal.subscribe("drochetti/ffmpeg-export-video", {
+        input: {
+          tracks: videoData,
         },
-        body: JSON.stringify(videoData),
       });
-      return response.json();
+      return data;
     },
     onSuccess(data) {
       console.log(JSON.stringify(data, null, 2));

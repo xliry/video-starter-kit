@@ -105,7 +105,7 @@ function MediaPropertyItem({
     <div
       className={cn(
         "group relative flex flex-col gap-1 rounded bg-black/50 p-3 text-sm flex-wrap text-wrap overflow-hidden",
-        className
+        className,
       )}
     >
       <div className="absolute right-2 top-2 opacity-30 transition-opacity group-hover:opacity-70">
@@ -158,7 +158,7 @@ export function MediaGallerySheet({
   };
   const mediaUrl = useMemo(
     () => resolveMediaUrl(selectedMedia?.output),
-    [selectedMedia]
+    [selectedMedia],
   );
   const prompt = selectedMedia?.input?.prompt;
   const duration = selectedMedia.endedAt
