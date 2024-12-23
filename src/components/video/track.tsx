@@ -93,9 +93,8 @@ export function VideoTrackView({
       : 1;
     const newTimestamp = (offsetX / parentWidth) * 30;
     frame.timestamp = (newTimestamp < 0 ? 0 : newTimestamp) * 1000;
-    db.keyFrames.update(frame.id, {
-      timestamp: frame.timestamp,
-    });
+    frame.timestamp = Math.min(frame.timestamp, 3000 - frame.duration);
+    db.keyFrames.update(frame.id, { timestamp: frame.timestamp });
   };
 
   return (
