@@ -16,6 +16,7 @@ import { ProjectDialog } from "./project-dialog";
 import { MediaGallerySheet } from "./media-gallery";
 import { ToastProvider } from "./ui/toast";
 import { Toaster } from "./ui/toaster";
+import { ExportDialog } from "./export-dialog";
 
 type AppProps = {
   projectId: string;
@@ -43,6 +44,11 @@ export function App({ projectId }: AppProps) {
       setSelectedMediaId(null);
     }
   };
+  const isExportDialogOpen = useStore(projectStore, (s) => s.exportDialogOpen);
+  const setExportDialogOpen = useStore(
+    projectStore,
+    (s) => s.setExportDialogOpen,
+  );
   return (
     <ToastProvider>
       <QueryClientProvider client={queryClient}>
@@ -60,6 +66,10 @@ export function App({ projectId }: AppProps) {
           <Toaster />
           <ProjectDialog open={projectDialogOpen} />
           <GenerateDialog open={generateDialogOpen} />
+          <ExportDialog
+            open={isExportDialogOpen}
+            onOpenChange={setExportDialogOpen}
+          />
           <MediaGallerySheet
             open={selectedMediaId !== null}
             onOpenChange={handleOnSheetOpenChange}

@@ -149,7 +149,7 @@ export function MediaGallerySheet({
   const setSelectedMediaId = useVideoProjectStore((s) => s.setSelectedMediaId);
   const setGenerateData = useVideoProjectStore((s) => s.setGenerateData);
   const setGenerateMediaType = useVideoProjectStore(
-    (s) => s.setGenerateMediaType
+    (s) => s.setGenerateMediaType,
   );
 
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);

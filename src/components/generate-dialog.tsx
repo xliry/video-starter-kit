@@ -278,9 +278,9 @@ export function GenerateDialog({
               {!generateData.image && (
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer min-h-[70px] flex flex-col items-center justify-center border border-dashed border-neutral-700 rounded-md p-4"
+                  className="cursor-pointer min-h-[70px] flex flex-col items-center justify-center border border-dashed border-border rounded-md p-4"
                 >
-                  <span className="text-gray-500 text-sm text-center">
+                  <span className="text-muted-foreground text-sm text-center">
                     Select an image
                   </span>
                 </label>
@@ -288,7 +288,7 @@ export function GenerateDialog({
               {generateData.image && (
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer max-h-[70px] flex flex-col items-center justify-center border border-dashed border-neutral-700 rounded-md"
+                  className="cursor-pointer max-h-[70px] flex flex-col items-center justify-center border border-dashed border-border rounded-md"
                 >
                   <img
                     id="image-preview"
