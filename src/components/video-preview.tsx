@@ -1,11 +1,11 @@
 import { db } from "@/data/db";
 import {
-  MOCK_JOBS,
-  MOCK_PROJECT,
-  MOCK_TRACKS,
-  MOCK_TRACK_FRAMES,
-} from "@/data/mock";
-import { queryKeys, useProject } from "@/data/queries";
+  EMPTY_VIDEO_COMPOSITION,
+  queryKeys,
+  useProject,
+  useVideoComposition,
+  VideoCompositionData,
+} from "@/data/queries";
 import {
   type GenerationJob,
   PROJECT_PLACEHOLDER,
@@ -18,8 +18,7 @@ import { useProjectId, useVideoProjectStore } from "@/data/store";
 import { resolveMediaUrl } from "@/lib/utils";
 import { Player, type PlayerRef } from "@remotion/player";
 import { preloadVideo, preloadAudio } from "@remotion/preload";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import {
   AbsoluteFill,
   Audio,
@@ -31,6 +30,7 @@ import {
 import { throttle } from "throttle-debounce";
 import { Button } from "./ui/button";
 import { DownloadIcon } from "lucide-react";
+import { fal } from "@/lib/fal";
 
 interface VideoCompositionProps {
   project: VideoProject;
@@ -189,54 +189,15 @@ const VoiceoverTrackSequence: React.FC<TrackSequenceProps> = ({
   );
 };
 
-type VideoCompositionData = {
-  tracks: VideoTrack[];
-  frames: Record<string, VideoKeyFrame[]>;
-  jobs: Record<string, GenerationJob>;
-};
-
-const EMPTY_COMPOSITION: VideoCompositionData = {
-  tracks: [],
-  frames: {},
-  jobs: {},
-};
-
 export default function VideoPreview() {
   const projectId = useProjectId();
   const setPlayer = useVideoProjectStore((s) => s.setPlayer);
 
   const { data: project = PROJECT_PLACEHOLDER } = useProject(projectId);
   const {
-    data: composition = EMPTY_COMPOSITION,
+    data: composition = EMPTY_VIDEO_COMPOSITION,
     isLoading: isCompositionLoading,
-  } = useQuery({
-    queryKey: queryKeys.projectPreview(projectId),
-    queryFn: async () => {
-      const tracks = await db.tracks.tracksByProject(projectId);
-      const frames = (
-        await Promise.all(
-          tracks.map((track) => db.keyFrames.keyFramesByTrack(track.id)),
-        )
-      ).flatMap((f) => f);
-      const jobs = await db.jobs.jobsByProject(projectId);
-      // return {
-      //   tracks: MOCK_TRACKS,
-      //   frames: MOCK_TRACK_FRAMES,
-      //   jobs: MOCK_JOBS,
-      // };
-      return {
-        tracks,
-        frames: Object.fromEntries(
-          tracks.map((track) => [
-            track.id,
-            frames.filter((f) => f.trackId === track.id),
-          ]),
-        ),
-        jobs: Object.fromEntries(jobs.map((job) => [job.id, job])),
-      } satisfies VideoCompositionData;
-    },
-  });
-  // console.log(JSON.stringify(composition, null, 2));
+  } = useVideoComposition(projectId);
   const { tracks = [], frames = {}, jobs = {} } = composition;
   useEffect(() => {
     const jobIds = Object.values(frames)
@@ -302,46 +263,17 @@ export default function VideoPreview() {
     });
   }, []);
 
-  const exportVideo = useMutation({
-    mutationFn: async () => {
-      const videoData = composition.tracks.map((track) => ({
-        id: track.id,
-        type: track.type === "video" ? "video" : "audio",
-        keyframes: composition.frames[track.id].map((frame) => ({
-          timestamp: frame.timestamp,
-          duration: frame.duration,
-          url: resolveMediaUrl(jobs[frame.data.jobId].output),
-        })),
-      }));
-      if (videoData.length === 0) {
-        throw new Error("No tracks to export");
-      }
-      const response = await fetch("/api/video/export", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(videoData),
-      });
-      return response.json();
-    },
-    onSuccess(data) {
-      console.log(JSON.stringify(data, null, 2));
-    },
-    onError(error) {
-      console.error(error);
-    },
-  });
+  const setExportDialogOpen = useVideoProjectStore(
+    (s) => s.setExportDialogOpen,
+  );
 
   return (
     <div className="flex-grow flex-1 h-full flex items-center justify-center bg-background-dark dark:bg-background-light relative">
       <Button
         className="absolute top-4 right-4"
         variant="default"
-        onClick={() => exportVideo.mutate()}
-        disabled={
-          isCompositionLoading || tracks.length === 0 || exportVideo.isPending
-        }
+        onClick={() => setExportDialogOpen(true)}
+        disabled={isCompositionLoading || tracks.length === 0}
       >
         <DownloadIcon className="w-4 h-4" />
         Export

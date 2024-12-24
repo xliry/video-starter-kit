@@ -93,7 +93,7 @@ export function JobItem({ data, className, onOpen, ...props }: JobItemProps) {
     <div
       className={cn(
         "flex items-start space-x-2 py-2 px-4 hover:bg-accent transition-all",
-        className
+        className,
       )}
       {...props}
       draggable={data.status === "completed"}

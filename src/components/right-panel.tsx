@@ -36,7 +36,7 @@ export default function RightPanel() {
 
   const { data: jobs = [], isLoading } = useProjectJobs(projectId);
   const setProjectDialogOpen = useVideoProjectStore(
-    (s) => s.setProjectDialogOpen
+    (s) => s.setProjectDialogOpen,
   );
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
 

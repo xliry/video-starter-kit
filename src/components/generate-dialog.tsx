@@ -1,5 +1,5 @@
 import { useJobCreator } from "@/data/mutations";
-import { queryKeys, useProject } from "@/data/queries";
+import { useProject } from "@/data/queries";
 import {
   type MediaType,
   useProjectId,
@@ -8,7 +8,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { AVAILABLE_ENDPOINTS } from "@/lib/fal";
 import { enhancePrompt } from "@/lib/prompt";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   ImageIcon,
   MicIcon,
@@ -52,7 +52,7 @@ function ModelEndpointPicker({
   const endpoints = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.filter((endpoint) => endpoint.category === mediaType),
-    [mediaType]
+    [mediaType],
   );
   return (
     <Select {...props}>
@@ -83,7 +83,7 @@ export function GenerateDialog({
   const projectId = useProjectId();
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
   const closeGenerateDialog = useVideoProjectStore(
-    (s) => s.closeGenerateDialog
+    (s) => s.closeGenerateDialog,
   );
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -124,14 +124,14 @@ export function GenerateDialog({
   const setMediaType = useVideoProjectStore((s) => s.setGenerateMediaType);
   const [endpointId, setEndpointId] = useState<string>(() => {
     const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType
+      (endpoint) => endpoint.category === mediaType,
     );
     return endpoint?.endpointId ?? AVAILABLE_ENDPOINTS[0].endpointId;
   });
   const handleMediaTypeChange = (mediaType: string) => {
     setMediaType(mediaType as MediaType);
     const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType
+      (endpoint) => endpoint.category === mediaType,
     );
 
     if (
@@ -148,7 +148,7 @@ export function GenerateDialog({
   type InputType = {
     prompt: string;
     image_url?: File | string | null;
-    image_size?: { width: number; height: number };
+    image_size?: { width: number; height: number } | string;
     aspect_ratio?: string;
     seconds_total?: number;
     voice?: string;
@@ -158,8 +158,7 @@ export function GenerateDialog({
   const input: InputType = {
     prompt: generateData.prompt,
     image_url: undefined,
-    image_size:
-      mediaType === "image" ? { width: 1920, height: 1080 } : undefined,
+    image_size: mediaType === "image" ? "landscape_16_9" : undefined,
     aspect_ratio: mediaType === "video" ? "16:9" : undefined,
     seconds_total:
       endpointId === "fal-ai/stable-audio" ? generateData.duration : undefined,
@@ -279,9 +278,9 @@ export function GenerateDialog({
               {!generateData.image && (
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer min-h-[70px] flex flex-col items-center justify-center border border-dashed border-neutral-700 rounded-md p-4"
+                  className="cursor-pointer min-h-[70px] flex flex-col items-center justify-center border border-dashed border-border rounded-md p-4"
                 >
-                  <span className="text-gray-500 text-sm text-center">
+                  <span className="text-muted-foreground text-sm text-center">
                     Select an image
                   </span>
                 </label>
@@ -289,7 +288,7 @@ export function GenerateDialog({
               {generateData.image && (
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer max-h-[70px] flex flex-col items-center justify-center border border-dashed border-neutral-700 rounded-md"
+                  className="cursor-pointer max-h-[70px] flex flex-col items-center justify-center border border-dashed border-border rounded-md"
                 >
                   <img
                     id="image-preview"

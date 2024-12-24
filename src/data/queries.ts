@@ -4,7 +4,12 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { db } from "./db";
-import { PROJECT_PLACEHOLDER } from "./schema";
+import {
+  GenerationJob,
+  PROJECT_PLACEHOLDER,
+  VideoKeyFrame,
+  VideoTrack,
+} from "./schema";
 
 export const queryKeys = {
   projects: ["projects"],
@@ -55,3 +60,39 @@ export const useProjectJobs = (projectId: string) => {
     placeholderData: keepPreviousData,
   });
 };
+
+export type VideoCompositionData = {
+  tracks: VideoTrack[];
+  frames: Record<string, VideoKeyFrame[]>;
+  jobs: Record<string, GenerationJob>;
+};
+
+export const EMPTY_VIDEO_COMPOSITION: VideoCompositionData = {
+  tracks: [],
+  frames: {},
+  jobs: {},
+};
+
+export const useVideoComposition = (projectId: string) =>
+  useQuery({
+    queryKey: queryKeys.projectPreview(projectId),
+    queryFn: async () => {
+      const tracks = await db.tracks.tracksByProject(projectId);
+      const frames = (
+        await Promise.all(
+          tracks.map((track) => db.keyFrames.keyFramesByTrack(track.id)),
+        )
+      ).flatMap((f) => f);
+      const jobs = await db.jobs.jobsByProject(projectId);
+      return {
+        tracks,
+        frames: Object.fromEntries(
+          tracks.map((track) => [
+            track.id,
+            frames.filter((f) => f.trackId === track.id),
+          ]),
+        ),
+        jobs: Object.fromEntries(jobs.map((job) => [job.id, job])),
+      } satisfies VideoCompositionData;
+    },
+  });

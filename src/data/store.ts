@@ -27,6 +27,7 @@ interface VideoProjectProps {
   selectedMediaId: string | null;
   selectedKeyframes: string[];
   generateData: GenerateData;
+  exportDialogOpen: boolean;
 }
 
 interface VideoProjectState extends VideoProjectProps {
@@ -41,6 +42,7 @@ interface VideoProjectState extends VideoProjectProps {
   setSelectedMediaId: (mediaId: string | null) => void;
   selectKeyframe: (frameId: string) => void;
   setGenerateData: (generateData: Partial<GenerateData>) => void;
+  setExportDialogOpen: (open: boolean) => void;
 }
 
 const DEFAULT_PROPS: VideoProjectProps = {
@@ -59,12 +61,13 @@ const DEFAULT_PROPS: VideoProjectProps = {
     duration: 30,
     voice: "",
   },
+  exportDialogOpen: false,
 };
 
 type VideoProjectStore = ReturnType<typeof createVideoProjectStore>;
 
 export const createVideoProjectStore = (
-  initProps?: Partial<VideoProjectProps>
+  initProps?: Partial<VideoProjectProps>,
 ) => {
   return createStore<VideoProjectState>()((set, state) => ({
     ...DEFAULT_PROPS,
@@ -101,15 +104,17 @@ export const createVideoProjectStore = (
         set({ selectedKeyframes: [...selected, frameId] });
       }
     },
+    setExportDialogOpen: (exportDialogOpen: boolean) =>
+      set({ exportDialogOpen }),
   }));
 };
 
 export const VideoProjectStoreContext = createContext<VideoProjectStore>(
-  createVideoProjectStore()
+  createVideoProjectStore(),
 );
 
 export function useVideoProjectStore<T>(
-  selector: (state: VideoProjectState) => T
+  selector: (state: VideoProjectState) => T,
 ): T {
   const store = useContext(VideoProjectStoreContext);
   return useStore(store, selector);
