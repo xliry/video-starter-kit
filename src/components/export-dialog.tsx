@@ -164,7 +164,6 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
           <Button
             onClick={handleOnShare}
             variant="secondary"
-            aria-disabled={actionsDisabled || !exportVideo.data}
             disabled={actionsDisabled || !exportVideo.data}
           >
             <ShareIcon className="w-4 h-4 opacity-50" />
@@ -173,6 +172,7 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
           <Button
             variant="secondary"
             disabled={actionsDisabled || !exportVideo.data}
+            aria-disabled={actionsDisabled || !exportVideo.data}
             asChild
           >
             <a href={exportVideo.data?.video_url ?? "#"} download>
