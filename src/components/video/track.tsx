@@ -32,7 +32,7 @@ export function VideoTrackRow({ data, ...props }: VideoTrackRowProps) {
           key={frame.id}
           className="absolute top-0 bottom-0 h-[4.5rem]"
           style={{
-            left: ((frame.timestamp * 1000) / 10 / 30).toFixed(2) + "%",
+            left: (frame.timestamp / 10 / 30).toFixed(2) + "%",
             width: (frame.duration / 10 / 30).toFixed(2) + "%",
           }}
           track={data}
@@ -135,9 +135,9 @@ export function VideoTrackView({
         ? (timelineElement as HTMLElement).offsetWidth
         : 1;
       const newTimestamp = (newLeft / parentWidth) * 30;
-      frame.timestamp = newTimestamp < 0 ? 0 : newTimestamp;
+      frame.timestamp = (newTimestamp < 0 ? 0 : newTimestamp) * 1000;
 
-      trackElement.style.left = `${(frame.timestamp / 30) * 100}%`;
+      trackElement.style.left = `${((frame.timestamp / 30) * 100) / 1000}%`;
       db.keyFrames.update(frame.id, { timestamp: frame.timestamp });
     };
 
