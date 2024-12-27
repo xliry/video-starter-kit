@@ -158,10 +158,7 @@ export function VideoTrackView({
       aria-checked={isSelected}
       onClick={handleOnClick}
       className={cn(
-        "p-0.5 flex flex-col border-2 border-transparent rounded h-full",
-        {
-          "border-white/50": isSelected,
-        },
+        "flex flex-col border border-transparent rounded-lg h-full",
         className
       )}
       {...props}
@@ -170,9 +167,11 @@ export function VideoTrackView({
         className={cn(
           "flex flex-col select-none rounded overflow-hidden group h-full",
           {
-            "bg-teal-500 dark:bg-teal-600": track.type === "video",
-            "bg-sky-500 dark:bg-sky-600": track.type === "music",
-            "bg-violet-500 dark:bg-violet-600": track.type === "voiceover",
+            "bg-gradient-to-t from-green-800 to-green-600":
+              track.type === "video",
+            "bg-gradient-to-t from-sky-800 to-sky-600": track.type === "music",
+            "bg-gradient-to-t from-violet-800 to-violet-600":
+              track.type === "voiceover",
           }
         )}
       >
