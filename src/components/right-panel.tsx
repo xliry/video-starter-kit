@@ -36,7 +36,7 @@ export default function RightPanel() {
 
   const { data: jobs = [], isLoading } = useProjectJobs(projectId);
   const setProjectDialogOpen = useVideoProjectStore(
-    (s) => s.setProjectDialogOpen,
+    (s) => s.setProjectDialogOpen
   );
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
 
@@ -65,7 +65,7 @@ export default function RightPanel() {
             name="name"
             placeholder="untitled"
             value={project.title}
-            onChange={() => {}}
+            onChange={(e) => projectUpdate.mutate({ title: e.target.value })}
             onBlur={(e) =>
               projectUpdate.mutate({ title: e.target.value.trim() })
             }
@@ -78,7 +78,9 @@ export default function RightPanel() {
             className="resize-none"
             value={project.description}
             rows={6}
-            onChange={() => {}}
+            onChange={(e) =>
+              projectUpdate.mutate({ description: e.target.value })
+            }
             onBlur={(e) =>
               projectUpdate.mutate({ description: e.target.value.trim() })
             }
