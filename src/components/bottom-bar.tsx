@@ -89,7 +89,7 @@ export default function BottomBar() {
           url: job.input?.image_url?.url,
         },
         timestamp: lastKeyframe
-          ? lastKeyframe.timestamp + 1 + lastKeyframe.duration / 1000
+          ? lastKeyframe.timestamp + 1 + lastKeyframe.duration
           : 0,
         duration:
           resolveDuration(job.input) ?? resolveDuration(job.output) ?? 5000,
