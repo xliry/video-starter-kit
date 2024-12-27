@@ -409,7 +409,7 @@ export function GenerateDialog({
           </div>
         )}
         {tab === "asset" && (
-          <div className="flex items-center gap-2 flex-wrap overflow-y-auto max-h-80">
+          <div className="flex items-center gap-2 flex-wrap overflow-y-auto max-h-80 divide-y divide-border">
             {jobs
               .filter((job) => {
                 if (assetMediaType === "all") return true;

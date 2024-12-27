@@ -88,7 +88,7 @@ export default function RightPanel() {
         </div>
       </div>
       <div className="flex-1 py-4 flex flex-col gap-4 border-b border-border h-full overflow-hidden relative">
-        <div className="flex flex-row gap-2 px-4">
+        <div className="flex flex-row items-center gap-2 px-4">
           <h2 className="text-sm text-muted-foreground font-semibold flex-1">
             Media Gallery
           </h2>
@@ -119,12 +119,12 @@ export default function RightPanel() {
             </Button>
           </div>
         )}
-        <div className="flex justify-end pt-4 px-4 border-t border-border">
+        <div className="flex justify-end pt-4 w-full px-4 border-t border-border">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="px-2">
                 <ListPlusIcon className="w-4 h-4 opacity-50" />
-                Media Type
+                <span className="capitalize">{mediaType}</span>
                 <ChevronDown className="w-4 h-4 opacity-50" />
               </Button>
             </DropdownMenuTrigger>

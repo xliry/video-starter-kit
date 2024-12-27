@@ -207,7 +207,12 @@ export function JobsPanel({ className, jobs, mediaType }: JobsPanelProps) {
   };
 
   return (
-    <div className={cn("flex flex-col overflow-hidden", className)}>
+    <div
+      className={cn(
+        "flex flex-col overflow-hidden divide-y divide-border",
+        className
+      )}
+    >
       {jobs
         .filter((job) => {
           if (mediaType === "all") return true;
@@ -216,9 +221,6 @@ export function JobsPanel({ className, jobs, mediaType }: JobsPanelProps) {
         .map((job, index) => (
           <Fragment key={job.id}>
             <JobItem data={job} onOpen={handleOnOpen} />
-            {index < jobs.length - 1 && (
-              <Separator className="px-2 ms-20 max-w-full" />
-            )}
           </Fragment>
         ))}
     </div>
