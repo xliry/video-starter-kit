@@ -44,6 +44,7 @@ import { Input } from "./ui/input";
 import { VoiceSelector } from "./playht/voice-selector";
 import { JobItem } from "./jobs-panel";
 import { GenerationJob } from "@/data/schema";
+import { resolveDurationFromMedia } from "@/lib/utils";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -336,14 +337,9 @@ export function GenerateDialog({
                       const file = e.target.files?.[0];
                       if (file) {
                         if (asset === "video" || asset === "audio") {
-                          const duration = await new Promise<number>(
-                            (resolve) => {
-                              const media = document.createElement(asset);
-                              media.onloadedmetadata = () => {
-                                resolve(media.duration);
-                              };
-                              media.src = URL.createObjectURL(file);
-                            }
+                          const duration = await resolveDurationFromMedia(
+                            file,
+                            asset
                           );
 
                           const data: Partial<GenerateData> = {

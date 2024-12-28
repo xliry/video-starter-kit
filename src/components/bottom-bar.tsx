@@ -5,7 +5,7 @@ import {
   type VideoTrack,
 } from "@/data/schema";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
-import { cn, resolveDuration } from "@/lib/utils";
+import { cn, resolveDuration, resolveDurationFromMedia } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AudioLinesIcon,
@@ -80,6 +80,24 @@ export default function BottomBar() {
           { timestamp: 0, duration: 0 }
         );
 
+      const fileType =
+        job.output?.audio_file || job.output?.audio || job.output?.audio_url
+          ? "audio"
+          : job.output?.video_url
+          ? "video"
+          : null;
+
+      const mediaUrl =
+        fileType === "video"
+          ? job.output?.video?.url
+          : fileType === "audio"
+          ? job.output?.audio?.url || job.output?.audio_file.url
+          : null;
+
+      const duration = fileType
+        ? await resolveDurationFromMedia(mediaUrl, fileType)
+        : resolveDuration(job.input) ?? resolveDuration(job.output) ?? 5000;
+
       const newId = await db.keyFrames.create({
         trackId: track.id,
         data: {
@@ -91,8 +109,7 @@ export default function BottomBar() {
         timestamp: lastKeyframe
           ? lastKeyframe.timestamp + 1 + lastKeyframe.duration
           : 0,
-        duration:
-          resolveDuration(job.input) ?? resolveDuration(job.output) ?? 5000,
+        duration,
       });
       return db.keyFrames.find(newId.toString());
     },
@@ -123,8 +140,8 @@ export default function BottomBar() {
   };
 
   return (
-    <div className="border-t border-border flex flex-col">
-      <div className="border-b border-border px-2 flex flex-row gap-8 py-2 justify-center items-center flex-1">
+    <div className="border-t pb-2 border-border flex flex-col bg-background-light ">
+      <div className="border-b border-border bg-background-dark px-2 flex flex-row gap-8 py-2 justify-center items-center flex-1">
         <VideoControls />
         <div className="h-full flex flex-col justify-center px-4 bg-muted/50 rounded-md font-mono cursor-default select-none shadow-inner">
           <div className="flex flex-row items-baseline font-thin tabular-nums">
@@ -176,7 +193,7 @@ export default function BottomBar() {
       </div> */}
       <div
         className={cn(
-          "min-h-64 max-h-72 h-full flex flex-row bg-background-light overflow-y-scroll transition-colors",
+          "min-h-64  max-h-72 h-full flex flex-row overflow-y-scroll transition-colors",
           {
             "bg-white/5": dragOverTracks,
           }

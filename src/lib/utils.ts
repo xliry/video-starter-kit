@@ -30,6 +30,19 @@ export const trackIcons: Record<
   image: ImageIcon,
 };
 
+export async function resolveDurationFromMedia(
+  video: string | File,
+  type: "video" | "audio"
+): Promise<number> {
+  return await new Promise<number>((resolve) => {
+    const media = document.createElement(type);
+    media.onloadedmetadata = () => {
+      resolve(media.duration * 1000);
+    };
+    media.src = video instanceof File ? URL.createObjectURL(video) : video;
+  });
+}
+
 export function resolveDuration(data: any): number | null {
   if (!data) return null;
   if ("seconds_total" in data) {
@@ -63,7 +76,7 @@ export function resolveMediaUrl(data: any): string | null {
     audio_url: 1,
   };
   const property = Object.keys(data).find(
-    (key) => key in fileProperties && "url" in data[key],
+    (key) => key in fileProperties && "url" in data[key]
   );
   if (property) {
     return data[property].url;
