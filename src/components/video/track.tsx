@@ -154,6 +154,7 @@ export function VideoTrackView({
     <div
       ref={trackRef}
       onMouseDown={handleMouseDown}
+      onContextMenu={(e) => e.preventDefault()}
       role="checkbox"
       aria-checked={isSelected}
       onClick={handleOnClick}
