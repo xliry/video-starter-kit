@@ -17,7 +17,12 @@ import {
   MoreHorizontalIcon,
   MusicIcon,
 } from "lucide-react";
-import { type DragEventHandler, type HTMLAttributes, useState } from "react";
+import {
+  type DragEventHandler,
+  type HTMLAttributes,
+  useMemo,
+  useState,
+} from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -129,6 +134,41 @@ export default function BottomBar() {
     },
   });
 
+  const trackObj: Record<string, VideoTrack> = useMemo(() => {
+    return {
+      video:
+        tracks.find((t) => t.type === "video") ||
+        ({
+          id: "video",
+          type: "video",
+          label: "Video",
+          locked: true,
+          keyframes: [],
+          projectId: projectId,
+        } as VideoTrack),
+      music:
+        tracks.find((t) => t.type === "music") ||
+        ({
+          id: "music",
+          type: "music",
+          label: "Music",
+          locked: true,
+          keyframes: [],
+          projectId: projectId,
+        } as VideoTrack),
+      voiceover:
+        tracks.find((t) => t.type === "voiceover") ||
+        ({
+          id: "voiceover",
+          type: "voiceover",
+          label: "Voiceover",
+          locked: true,
+          keyframes: [],
+          projectId: projectId,
+        } as VideoTrack),
+    };
+  }, [tracks]);
+
   const handleOnDrop: DragEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault();
     setDragOverTracks(false);
@@ -211,15 +251,19 @@ export default function BottomBar() {
           ></div>
           <TimelineRuler className="z-30 pointer-events-none" />
           <div className="flex timeline-container flex-col h-full mx-4 mt-10 gap-2 z-[31] pb-2">
-            {tracks.map((track) => (
-              <VideoTrackRow
-                key={track.id}
-                data={track}
-                style={{
-                  minWidth: minTrackWidth,
-                }}
-              />
-            ))}
+            {Object.values(trackObj).map((track, index) =>
+              track ? (
+                <VideoTrackRow
+                  key={track.id}
+                  data={track}
+                  style={{
+                    minWidth: minTrackWidth,
+                  }}
+                />
+              ) : (
+                <div className="flex flex-row relative w-full h-full timeline-container"></div>
+              )
+            )}
           </div>
         </div>
         {/* <div className="flex flex-col gap-2 items-center justify-center h-full text-sm">
