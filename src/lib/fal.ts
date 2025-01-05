@@ -91,7 +91,7 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
       "MMAudio generates synchronized audio given video and/or text inputs. It can be combined with video models to get videos with audio.",
     cost: "",
     inputAsset: ["video"],
-    category: "music",
+    category: "video",
   },
   {
     endpointId: "fal-ai/sync-lipsync",
