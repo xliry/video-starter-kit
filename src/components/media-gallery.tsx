@@ -33,6 +33,7 @@ import { formatDuration } from "date-fns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { db } from "@/data/db";
 import { LoadingIcon } from "./ui/icons";
+import { AVAILABLE_ENDPOINTS } from "@/lib/fal";
 
 type MediaGallerySheetProps = ComponentProps<typeof Sheet> & {
   selectedMediaId: string;
@@ -105,7 +106,7 @@ function MediaPropertyItem({
     <div
       className={cn(
         "group relative flex flex-col gap-1 rounded bg-black/50 p-3 text-sm flex-wrap text-wrap overflow-hidden",
-        className,
+        className
       )}
     >
       <div className="absolute right-2 top-2 opacity-30 transition-opacity group-hover:opacity-70">
@@ -148,8 +149,9 @@ export function MediaGallerySheet({
     jobs.find((job) => job.id === selectedMediaId) ?? MEDIA_PLACEHOLDER;
   const setSelectedMediaId = useVideoProjectStore((s) => s.setSelectedMediaId);
   const setGenerateData = useVideoProjectStore((s) => s.setGenerateData);
+  const setEndpointId = useVideoProjectStore((s) => s.setEndpointId);
   const setGenerateMediaType = useVideoProjectStore(
-    (s) => s.setGenerateMediaType,
+    (s) => s.setGenerateMediaType
   );
 
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
@@ -158,7 +160,14 @@ export function MediaGallerySheet({
     setGenerateMediaType("video");
     openGenerateDialog();
     const image = selectedMedia.output?.images?.[0]?.url;
-    setGenerateData({ image });
+
+    const endpoint = AVAILABLE_ENDPOINTS.find(
+      (endpoint) => endpoint.category === "video"
+    );
+
+    setEndpointId(endpoint?.endpointId ?? AVAILABLE_ENDPOINTS[0].endpointId);
+
+    setGenerateData({ image, duration: undefined });
     setSelectedMediaId(null);
   };
 
@@ -172,7 +181,7 @@ export function MediaGallerySheet({
   };
   const mediaUrl = useMemo(
     () => resolveMediaUrl(selectedMedia?.output),
-    [selectedMedia],
+    [selectedMedia]
   );
   const prompt = selectedMedia?.input?.prompt;
   const duration = selectedMedia.endedAt

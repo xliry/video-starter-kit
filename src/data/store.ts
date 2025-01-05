@@ -1,5 +1,6 @@
 "use client";
 
+import { AVAILABLE_ENDPOINTS } from "@/lib/fal";
 import type { PlayerRef } from "@remotion/player";
 import { createContext, useContext } from "react";
 import { createStore } from "zustand";
@@ -30,6 +31,7 @@ interface VideoProjectProps {
   selectedKeyframes: string[];
   generateData: GenerateData;
   exportDialogOpen: boolean;
+  endpointId: string;
 }
 
 interface VideoProjectState extends VideoProjectProps {
@@ -46,10 +48,12 @@ interface VideoProjectState extends VideoProjectProps {
   selectKeyframe: (frameId: string) => void;
   setGenerateData: (generateData: Partial<GenerateData>) => void;
   setExportDialogOpen: (open: boolean) => void;
+  setEndpointId: (endpointId: string) => void;
 }
 
 const DEFAULT_PROPS: VideoProjectProps = {
   projectId: "",
+  endpointId: AVAILABLE_ENDPOINTS[0].endpointId,
   projectDialogOpen: false,
   player: null,
   playerCurrentTimestamp: 0,
@@ -78,6 +82,7 @@ export const createVideoProjectStore = (
     ...DEFAULT_PROPS,
     ...initProps,
     projectDialogOpen: initProps?.projectId ? false : true,
+    setEndpointId: (endpointId: string) => set({ endpointId }),
     setProjectId: (projectId: string) => set({ projectId }),
     setProjectDialogOpen: (projectDialogOpen: boolean) =>
       set({ projectDialogOpen }),

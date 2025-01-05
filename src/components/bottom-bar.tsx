@@ -88,7 +88,7 @@ export default function BottomBar() {
       const fileType =
         job.output?.audio_file || job.output?.audio || job.output?.audio_url
           ? "audio"
-          : job.output?.video_url
+          : job.output?.video_url || job.output?.video
           ? "video"
           : null;
 

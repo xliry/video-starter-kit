@@ -90,8 +90,13 @@ export function GenerateDialog({
   onOpenChange,
   ...props
 }: GenerateDialogProps) {
-  const { generateData, setGenerateData, resetGenerateData } =
-    useVideoProjectStore((s) => s);
+  const {
+    generateData,
+    setGenerateData,
+    resetGenerateData,
+    endpointId,
+    setEndpointId,
+  } = useVideoProjectStore((s) => s);
 
   const [tab, setTab] = useState<"generation" | "asset">("generation");
   const [assetMediaType, setAssetMediaType] = useState("all");
@@ -135,12 +140,6 @@ export function GenerateDialog({
   const { data: jobs = [] } = useProjectJobs(projectId);
   const mediaType = useVideoProjectStore((s) => s.generateMediaType);
   const setMediaType = useVideoProjectStore((s) => s.setGenerateMediaType);
-  const [endpointId, setEndpointId] = useState<string>(() => {
-    const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType
-    );
-    return endpoint?.endpointId ?? AVAILABLE_ENDPOINTS[0].endpointId;
-  });
 
   const endpoint = useMemo(
     () =>
