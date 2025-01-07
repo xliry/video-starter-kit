@@ -58,7 +58,7 @@ function ModelEndpointPicker({
   const endpoints = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.filter((endpoint) => endpoint.category === mediaType),
-    [mediaType]
+    [mediaType],
   );
   return (
     <Select {...props}>
@@ -103,7 +103,7 @@ export function GenerateDialog({
   const projectId = useProjectId();
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
   const closeGenerateDialog = useVideoProjectStore(
-    (s) => s.closeGenerateDialog
+    (s) => s.closeGenerateDialog,
   );
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -144,14 +144,14 @@ export function GenerateDialog({
   const endpoint = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.find(
-        (endpoint) => endpoint.endpointId === endpointId
+        (endpoint) => endpoint.endpointId === endpointId,
       ),
-    [endpointId]
+    [endpointId],
   );
   const handleMediaTypeChange = (mediaType: string) => {
     setMediaType(mediaType as MediaType);
     const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType
+      (endpoint) => endpoint.category === mediaType,
     );
 
     if (
@@ -338,7 +338,7 @@ export function GenerateDialog({
                         if (asset === "video" || asset === "audio") {
                           const duration = await resolveDurationFromMedia(
                             file,
-                            asset
+                            asset,
                           );
 
                           const data: Partial<GenerateData> = {

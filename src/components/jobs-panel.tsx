@@ -100,7 +100,7 @@ export function JobItem({
     <div
       className={cn(
         "flex items-start space-x-2 py-2 w-full px-4 hover:bg-accent transition-all",
-        className
+        className,
       )}
       {...props}
       onClick={(e) => {
@@ -137,7 +137,7 @@ export function JobItem({
                 "w-full h-full flex items-center justify-center top-0 left-0 absolute p-2 z-50",
                 (data.mediaType === "music" ||
                   data.mediaType === "voiceover") &&
-                  "rounded-full bg-white/5"
+                  "rounded-full bg-white/5",
               )}
             >
               <div className="z-50 bg-black/60 p-2 rounded-full flex items-center justify-center text-muted-foreground">
@@ -210,7 +210,7 @@ export function JobsPanel({ className, jobs, mediaType }: JobsPanelProps) {
     <div
       className={cn(
         "flex flex-col overflow-hidden divide-y divide-border",
-        className
+        className,
       )}
     >
       {jobs
