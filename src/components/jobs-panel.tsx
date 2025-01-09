@@ -100,21 +100,35 @@ export function JobItem({
     <div
       className={cn(
         "flex items-start space-x-2 py-2 w-full px-4 hover:bg-accent transition-all",
-        className,
+        className
       )}
       {...props}
       onClick={(e) => {
-        if (draggable) return;
         e.stopPropagation();
         onOpen(data);
       }}
       draggable={draggable && data.status === "completed"}
       onDragStart={handleOnDragStart}
     >
-      <button
-        className="w-16 h-16 aspect-square relative rounded overflow-hidden border border-transparent hover:border-accent transition-all"
-        onClick={() => onOpen(data)}
-      >
+      {draggable && data.status === "completed" && (
+        <div className="flex items-center h-full cursor-grab text-muted-foreground">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 8h16M4 16h16"
+            />
+          </svg>
+        </div>
+      )}
+      <div className="w-16 h-16 aspect-square relative rounded overflow-hidden border border-transparent hover:border-accent transition-all">
         {data.status === "completed" ? (
           <>
             {data.mediaType === "image" && (
@@ -137,7 +151,7 @@ export function JobItem({
                 "w-full h-full flex items-center justify-center top-0 left-0 absolute p-2 z-50",
                 (data.mediaType === "music" ||
                   data.mediaType === "voiceover") &&
-                  "rounded-full bg-white/5",
+                  "rounded-full bg-white/5"
               )}
             >
               <div className="z-50 bg-black/60 p-2 rounded-full flex items-center justify-center text-muted-foreground">
@@ -158,7 +172,7 @@ export function JobItem({
             )}
           </div>
         )}
-      </button>
+      </div>
       <div className="flex flex-col h-full gap-1 flex-1">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium flex flex-row gap-1 items-center">
@@ -210,7 +224,7 @@ export function JobsPanel({ className, jobs, mediaType }: JobsPanelProps) {
     <div
       className={cn(
         "flex flex-col overflow-hidden divide-y divide-border",
-        className,
+        className
       )}
     >
       {jobs
