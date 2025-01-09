@@ -4,6 +4,7 @@ import { type ClassValue, clsx } from "clsx";
 import { ImageIcon, MicIcon, MusicIcon, VideoIcon } from "lucide-react";
 import type { FunctionComponent } from "react";
 import { twMerge } from "tailwind-merge";
+import { InputAsset } from "./fal";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -32,7 +33,7 @@ export const trackIcons: Record<
 
 export async function resolveDurationFromMedia(
   video: string | File,
-  type: "video" | "audio",
+  type: "video" | "audio"
 ): Promise<number> {
   return await new Promise<number>((resolve) => {
     const media = document.createElement(type);
@@ -76,10 +77,18 @@ export function resolveMediaUrl(data: any): string | null {
     audio_url: 1,
   };
   const property = Object.keys(data).find(
-    (key) => key in fileProperties && "url" in data[key],
+    (key) => key in fileProperties && "url" in data[key]
   );
   if (property) {
     return data[property].url;
   }
   return null;
+}
+
+export function getAssetType(asset: InputAsset): "image" | "video" | "audio" {
+  return typeof asset === "string" ? asset : asset.type;
+}
+
+export function getAssetKey(asset: InputAsset): string {
+  return typeof asset === "string" ? asset : asset.key;
 }

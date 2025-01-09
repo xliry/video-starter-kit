@@ -4,7 +4,14 @@ export const fal = createFalClient({
   proxyUrl: "/api/fal",
 });
 
-export type InputAsset = "video" | "image" | "audio";
+export type InputAsset =
+  | "video"
+  | "image"
+  | "audio"
+  | {
+      type: "video" | "image" | "audio";
+      key: string;
+    };
 
 export type ApiInfo = {
   endpointId: string;
@@ -83,6 +90,12 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
       "Advanced AI techniques to create high-quality, diverse musical compositions",
     cost: "",
     category: "music",
+    inputAsset: [
+      {
+        type: "audio",
+        key: "reference_audio_url",
+      },
+    ],
   },
   {
     endpointId: "fal-ai/mmaudio-v2",

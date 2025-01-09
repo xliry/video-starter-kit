@@ -44,7 +44,11 @@ import { Input } from "./ui/input";
 import { VoiceSelector } from "./playht/voice-selector";
 import { JobItem } from "./jobs-panel";
 import { GenerationJob } from "@/data/schema";
-import { resolveDurationFromMedia } from "@/lib/utils";
+import {
+  getAssetKey,
+  getAssetType,
+  resolveDurationFromMedia,
+} from "@/lib/utils";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -58,7 +62,7 @@ function ModelEndpointPicker({
   const endpoints = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.filter((endpoint) => endpoint.category === mediaType),
-    [mediaType],
+    [mediaType]
   );
   return (
     <Select {...props}>
@@ -80,7 +84,7 @@ function ModelEndpointPicker({
 
 type GenerateDialogProps = {} & Parameters<typeof Dialog>[0];
 
-const assetKeyMap: Record<InputAsset, keyof GenerateData> = {
+const assetKeyMap: Record<"image" | "video" | "audio", keyof GenerateData> = {
   image: "image",
   video: "video_url",
   audio: "audio_url",
@@ -103,7 +107,7 @@ export function GenerateDialog({
   const projectId = useProjectId();
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
   const closeGenerateDialog = useVideoProjectStore(
-    (s) => s.closeGenerateDialog,
+    (s) => s.closeGenerateDialog
   );
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -144,14 +148,14 @@ export function GenerateDialog({
   const endpoint = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.find(
-        (endpoint) => endpoint.endpointId === endpointId,
+        (endpoint) => endpoint.endpointId === endpointId
       ),
-    [endpointId],
+    [endpointId]
   );
   const handleMediaTypeChange = (mediaType: string) => {
     setMediaType(mediaType as MediaType);
     const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType,
+      (endpoint) => endpoint.category === mediaType
     );
 
     if (
@@ -175,6 +179,7 @@ export function GenerateDialog({
     seconds_total?: number;
     voice?: string;
     input?: string;
+    reference_audio_url?: File | string | null;
   };
 
   const input: InputType = {
@@ -197,6 +202,9 @@ export function GenerateDialog({
   }
   if (generateData.audio_url) {
     input["audio_url"] = generateData.audio_url;
+  }
+  if (generateData.reference_audio_url) {
+    input["reference_audio_url"] = generateData.reference_audio_url;
   }
 
   const extraInput =
@@ -233,13 +241,33 @@ export function GenerateDialog({
   };
 
   const handleSelectMedia = (job: GenerationJob) => {
+    const asset = endpoint?.inputAsset?.find((item) => {
+      const assetType = getAssetType(item);
+
+      if (
+        assetType === "audio" &&
+        (job.mediaType === "voiceover" || job.mediaType === "music")
+      ) {
+        return true;
+      } else {
+        return assetType === job.mediaType;
+      }
+    });
+
+    if (!asset) {
+      setTab("generation");
+      return;
+    }
+
+    const key = getAssetKey(asset) || getAssetType(asset);
+
     if (job.mediaType === "image") {
-      setGenerateData({ image: job.output?.images?.[0]?.url });
+      setGenerateData({ [key]: job.output?.images?.[0]?.url });
     } else if (job.mediaType === "video") {
-      setGenerateData({ video_url: job.output?.video?.url });
+      setGenerateData({ [key]: job.output?.video?.url });
     } else if (job.mediaType === "music" || job.mediaType === "voiceover") {
       setGenerateData({
-        audio_url: job.output?.audio?.url || job.output?.audio_file?.url,
+        [key]: job.output?.audio?.url || job.output?.audio_file?.url,
       });
     }
     setTab("generation");
@@ -323,42 +351,52 @@ export function GenerateDialog({
 
             <div className="flex divide-x divide-border">
               {endpoint?.inputAsset?.map((asset) => (
-                <div className="max-w-xs py-4 px-8" key={asset}>
+                <div className="max-w-xs py-4 px-8" key={getAssetType(asset)}>
                   <h4 className="capitalize font-medium mb-2">
-                    {asset} Reference
+                    {getAssetType(asset)} Reference
                   </h4>
                   <Input
-                    key={asset}
+                    key={getAssetType(asset)}
                     type="file"
                     className="hidden"
                     id={`${asset}-upload`}
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        if (asset === "video" || asset === "audio") {
+                        if (
+                          getAssetType(asset) === "video" ||
+                          getAssetType(asset) === "audio"
+                        ) {
                           const duration = await resolveDurationFromMedia(
                             file,
-                            asset,
+                            getAssetType(asset) as "video" | "audio"
                           );
 
                           const data: Partial<GenerateData> = {
-                            [assetKeyMap[asset]]: file,
+                            [getAssetKey(asset) ??
+                            assetKeyMap[getAssetType(asset)]]: file,
                           };
+
                           if (!generateData.duration) data.duration = duration;
                           setGenerateData(data);
                         } else {
-                          setGenerateData({ [assetKeyMap[asset]]: file });
+                          setGenerateData({
+                            [getAssetKey(asset) ??
+                            assetKeyMap[getAssetType(asset)]]: file,
+                          });
                         }
                       }
                     }}
                   />
-                  {!generateData[assetKeyMap[asset]] && (
+                  {!generateData[
+                    getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
+                  ] && (
                     <div className="flex flex-col min-h-[70px] justify-between">
                       <Button
                         variant="ghost"
                         onClick={() => {
                           setTab("asset");
-                          setAssetMediaType(asset ?? "all");
+                          setAssetMediaType(getAssetType(asset) ?? "all");
                         }}
                         className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
                       >
@@ -367,7 +405,7 @@ export function GenerateDialog({
                         </span>
                       </Button>
                       <label
-                        htmlFor={`${asset}-upload`}
+                        htmlFor={`${getAssetType(asset)}-upload`}
                         className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
                       >
                         <span className="text-muted-foreground text-xs text-center text-nowrap">
@@ -376,21 +414,26 @@ export function GenerateDialog({
                       </label>
                     </div>
                   )}
-                  {generateData[assetKeyMap[asset]] && (
+                  {generateData[
+                    getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
+                  ] && (
                     <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md">
                       <WithTooltip tooltip="Remove media">
                         <button
                           className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
                           onClick={() =>
                             setGenerateData({
-                              [assetKeyMap[asset]]: undefined,
+                              [getAssetKey(asset) ??
+                              assetKeyMap[getAssetType(asset)]]: undefined,
                             })
                           }
                         >
                           <TrashIcon className="w-3 h-3 stroke-2" />
                         </button>
                       </WithTooltip>
-                      {generateData[assetKeyMap[asset]] && (
+                      {generateData[
+                        getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
+                      ] && (
                         <SelectedAssetPreview
                           asset={asset}
                           data={generateData}
@@ -505,38 +548,43 @@ const SelectedAssetPreview = ({
   data: GenerateData;
   asset: InputAsset;
 }) => {
+  const assetType = getAssetType(asset);
+  const assetKey = getAssetKey(asset);
+
+  if (!data[assetKey]) return null;
+
   return (
     <>
-      {data.audio_url && asset === "audio" && (
+      {assetType === "audio" && (
         <audio
           src={
-            data.audio_url && typeof data.audio_url !== "string"
-              ? URL.createObjectURL(data.audio_url)
-              : data.audio_url || ""
+            data[assetKey] && typeof data[assetKey] !== "string"
+              ? URL.createObjectURL(data[assetKey])
+              : data[assetKey] || ""
           }
           className=""
           controls={true}
         />
       )}
-      {data.video_url && asset === "video" && (
+      {assetType === "video" && (
         <video
           src={
-            data.video_url && typeof data.video_url !== "string"
-              ? URL.createObjectURL(data.video_url)
-              : data.video_url || ""
+            data[assetKey] && typeof data[assetKey] !== "string"
+              ? URL.createObjectURL(data[assetKey])
+              : data[assetKey] || ""
           }
           className=""
           controls={false}
           style={{ pointerEvents: "none" }}
         />
       )}
-      {data.image && asset === "image" && (
+      {assetType === "image" && (
         <img
           id="image-preview"
           src={
-            data.image && typeof data.image !== "string"
-              ? URL.createObjectURL(data.image)
-              : data.image || ""
+            data[assetKey] && typeof data[assetKey] !== "string"
+              ? URL.createObjectURL(data[assetKey])
+              : data[assetKey] || ""
           }
           className=""
           alt="Image Preview"
