@@ -3,7 +3,6 @@ import {
   EMPTY_VIDEO_COMPOSITION,
   useProject,
   useVideoComposition,
-  VideoCompositionData,
 } from "@/data/queries";
 import {
   type MediaItem,
@@ -86,15 +85,8 @@ const MainComposition: React.FC<VideoCompositionProps> = ({
               mediaItems={mediaItems}
             />
           )}
-          {track.type === "music" && (
-            <MusicTrackSequence
-              track={track}
-              frames={frames[track.id] || []}
-              mediaItems={mediaItems}
-            />
-          )}
-          {track.type === "voiceover" && (
-            <VoiceoverTrackSequence
+          {(track.type === "music" || track.type === "voiceover") && (
+            <AudioTrackSequence
               track={track}
               frames={frames[track.id] || []}
               mediaItems={mediaItems}
@@ -141,7 +133,7 @@ const VideoTrackSequence: React.FC<TrackSequenceProps> = ({
   );
 };
 
-const MusicTrackSequence: React.FC<TrackSequenceProps> = ({
+const AudioTrackSequence: React.FC<TrackSequenceProps> = ({
   frames,
   mediaItems,
 }) => {
@@ -209,18 +201,20 @@ export default function VideoPreview() {
       .map((f) => f.data.mediaId);
     Object.values(mediaItems)
       .filter(
-        (media) => media.status === "completed" && mediaIds.includes(media.id),
+        (media) => media.status === "completed" && mediaIds.includes(media.id)
       )
       .forEach((media) => {
-        // if (job.output?.video?.url) {
-        //   preloadVideo(job.output.video.url);
-        // }
-        // if (job.output?.audio_file?.url) {
-        //   preloadAudio(job.output.audio_file.url);
-        // }
-        // if (job.output?.audio_url?.url) {
-        //   preloadAudio(job.output.audio_url.url);
-        // }
+        const mediaUrl = resolveMediaUrl(media);
+        if (!mediaUrl) return;
+        if (media.mediaType === "video") {
+          preloadVideo(mediaUrl);
+        }
+        if (
+          mediaUrl.indexOf("v2.") === -1 &&
+          (media.mediaType === "music" || media.mediaType === "voiceover")
+        ) {
+          preloadAudio(mediaUrl);
+        }
       });
   }, [frames]);
 
@@ -239,14 +233,14 @@ export default function VideoPreview() {
   const duration = calculateDuration();
 
   const setPlayerCurrentTimestamp = useVideoProjectStore(
-    (s) => s.setPlayerCurrentTimestamp,
+    (s) => s.setPlayerCurrentTimestamp
   );
 
   const setPlayerState = useVideoProjectStore((s) => s.setPlayerState);
   // Frame updates are super frequent, so we throttle the updates to the timestamp
   const updatePlayerCurrentTimestamp = useCallback(
     throttle(64, setPlayerCurrentTimestamp),
-    [],
+    []
   );
 
   // Register events on the player
@@ -270,7 +264,7 @@ export default function VideoPreview() {
   }, []);
 
   const setExportDialogOpen = useVideoProjectStore(
-    (s) => s.setExportDialogOpen,
+    (s) => s.setExportDialogOpen
   );
 
   return (
