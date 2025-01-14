@@ -69,7 +69,7 @@ export function VideoTrackView({
   };
 
   const isSelected = useVideoProjectStore((state) =>
-    state.selectedKeyframes.includes(frame.id)
+    state.selectedKeyframes.includes(frame.id),
   );
   const selectKeyframe = useVideoProjectStore((state) => state.selectKeyframe);
   const handleOnClick: MouseEventHandler = (e) => {
@@ -170,7 +170,7 @@ export function VideoTrackView({
 
   const handleResize = (
     e: React.MouseEvent<HTMLDivElement>,
-    direction: "left" | "right"
+    direction: "left" | "right",
   ) => {
     e.stopPropagation();
     const trackElement = trackRef.current;
@@ -228,7 +228,7 @@ export function VideoTrackView({
       onClick={handleOnClick}
       className={cn(
         "flex flex-col border border-transparent rounded-lg h-full",
-        className
+        className,
       )}
       {...props}
     >
@@ -241,7 +241,7 @@ export function VideoTrackView({
             "bg-gradient-to-t from-sky-800 to-sky-600": track.type === "music",
             "bg-gradient-to-t from-violet-800 to-violet-600":
               track.type === "voiceover",
-          }
+          },
         )}
       >
         <div className="px-2 py-0.5 bg-black/10 flex flex-row items-center">
@@ -276,15 +276,14 @@ export function VideoTrackView({
           /> */}
           <div
             className={cn(
-              "absolute right-0 top-0 bg- bottom-0 w-2 m-1 cursor-ew-resize",
-              {
-                "bg-green-400/50 rounded-md": track.type === "video",
-                "bg-sky-400/50 rounded-md": track.type === "music",
-                "bg-violet-400/50 rounded-md": track.type === "voiceover",
-              }
+              "absolute right-0 top-0 bg-white/5 group-hover:bg-white/15",
+              "rounded-md bottom-0 w-2 m-1 p-px cursor-ew-resize text-white/30 group-hover:text-white/60",
+              "transition-colors flex flex-col items-center justify-center text-sm tracking-tighter",
             )}
             onMouseDown={(e) => handleResize(e, "right")}
-          />
+          >
+            <span>||</span>
+          </div>
         </div>
       </div>
     </div>
