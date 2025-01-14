@@ -55,7 +55,7 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
       if (videoData.length === 0) {
         throw new Error("No tracks to export");
       }
-      const { data } = await fal.subscribe("drochetti/ffmpeg-export-video", {
+      const { data } = await fal.subscribe("drochetti/ffmpeg-api/compose", {
         input: {
           tracks: videoData,
         },
