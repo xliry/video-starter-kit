@@ -4,9 +4,14 @@ import {
   refreshVideoCache,
   useProjectMediaItems,
 } from "@/data/queries";
-import type { VideoKeyFrame, VideoTrack } from "@/data/schema";
+import type { MediaItem, VideoKeyFrame, VideoTrack } from "@/data/schema";
 import { cn, resolveMediaUrl, trackIcons } from "@/lib/utils";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
 import {
   type HTMLAttributes,
@@ -17,6 +22,7 @@ import {
 } from "react";
 import { WithTooltip } from "../ui/tooltip";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
+import { fal } from "@/lib/fal";
 
 type VideoTrackRowProps = {
   data: VideoTrack;
@@ -44,6 +50,60 @@ export function VideoTrackRow({ data, ...props }: VideoTrackRowProps) {
           frame={frame}
         />
       ))}
+    </div>
+  );
+}
+
+type AudioWaveformProps = {
+  data: MediaItem;
+};
+
+function AudioWaveform({ data }: AudioWaveformProps) {
+  const { data: waveform = [] } = useQuery({
+    queryKey: ["media", "waveform", data.id],
+    queryFn: async () => {
+      if (data.metadata?.waveform && Array.isArray(data.metadata.waveform)) {
+        return data.metadata.waveform;
+      }
+      const { data: waveformInfo } = await fal.subscribe(
+        "drochetti/ffmpeg-api/waveform",
+        {
+          input: {
+            media_url: resolveMediaUrl(data),
+            samples_per_second: 48,
+            precision: 3,
+          },
+        },
+      );
+      await db.media.update(data.id, {
+        ...data,
+        metadata: {
+          ...data.metadata,
+          waveform: waveformInfo.waveform,
+        },
+      });
+      return waveformInfo.waveform as number[];
+    },
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
+  });
+  return (
+    <div className="flex flex-row items-center h-full gap-px">
+      {waveform.map((v, index) => {
+        const amplitude = Math.abs(v);
+        const height = Math.max(amplitude * 100, 2);
+        return (
+          <div key={index} className="flex flex-col justify-center h-full">
+            <div
+              className="w-[2px] rounded bg-black/40"
+              style={{
+                height: `${height}%`,
+                minHeight: "2px",
+              }}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -266,14 +326,9 @@ export function VideoTrackView({
         </div>
         <div className="p-px flex-1 items-center h-full relative">
           {imageUrl && <img src={imageUrl} className="rounded h-8" alt="" />}
-          {/* TODO: Add audio waveform */}
-          {/* {(media.mediaType === "music" || media.mediaType === "voiceover") && (
+          {(media.mediaType === "music" || media.mediaType === "voiceover") && (
             <AudioWaveform data={media} />
-          )} */}
-          {/* <div
-            className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize"
-            onMouseDown={(e) => handleResize(e, "left")}
-          /> */}
+          )}
           <div
             className={cn(
               "absolute right-0 top-0 bg-white/5 group-hover:bg-white/15",
