@@ -62,7 +62,7 @@ function ModelEndpointPicker({
   const endpoints = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.filter((endpoint) => endpoint.category === mediaType),
-    [mediaType]
+    [mediaType],
   );
   return (
     <Select {...props}>
@@ -107,7 +107,7 @@ export function GenerateDialog({
   const projectId = useProjectId();
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
   const closeGenerateDialog = useVideoProjectStore(
-    (s) => s.closeGenerateDialog
+    (s) => s.closeGenerateDialog,
   );
   const handleOnOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -148,14 +148,14 @@ export function GenerateDialog({
   const endpoint = useMemo(
     () =>
       AVAILABLE_ENDPOINTS.find(
-        (endpoint) => endpoint.endpointId === endpointId
+        (endpoint) => endpoint.endpointId === endpointId,
       ),
-    [endpointId]
+    [endpointId],
   );
   const handleMediaTypeChange = (mediaType: string) => {
     setMediaType(mediaType as MediaType);
     const endpoint = AVAILABLE_ENDPOINTS.find(
-      (endpoint) => endpoint.category === mediaType
+      (endpoint) => endpoint.category === mediaType,
     );
 
     if (
@@ -369,12 +369,12 @@ export function GenerateDialog({
                         ) {
                           const duration = await resolveDurationFromMedia(
                             file,
-                            getAssetType(asset) as "video" | "audio"
+                            getAssetType(asset) as "video" | "audio",
                           );
 
                           const data: Partial<GenerateData> = {
                             [getAssetKey(asset) ??
-                            assetKeyMap[getAssetType(asset)]]: file,
+                              assetKeyMap[getAssetType(asset)]]: file,
                           };
 
                           if (!generateData.duration) data.duration = duration;
@@ -382,7 +382,7 @@ export function GenerateDialog({
                         } else {
                           setGenerateData({
                             [getAssetKey(asset) ??
-                            assetKeyMap[getAssetType(asset)]]: file,
+                              assetKeyMap[getAssetType(asset)]]: file,
                           });
                         }
                       }
@@ -424,7 +424,7 @@ export function GenerateDialog({
                           onClick={() =>
                             setGenerateData({
                               [getAssetKey(asset) ??
-                              assetKeyMap[getAssetType(asset)]]: undefined,
+                                assetKeyMap[getAssetType(asset)]]: undefined,
                             })
                           }
                         >

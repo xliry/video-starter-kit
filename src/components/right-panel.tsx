@@ -14,7 +14,8 @@ import {
   ListPlusIcon,
   MicIcon,
   MusicIcon,
-  Upload,
+  UploadIcon,
+  LoaderCircleIcon,
 } from "lucide-react";
 import { JobsPanel } from "./jobs-panel";
 import { Button } from "./ui/button";
@@ -27,8 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useState } from "react";
-import { UploadButton } from "@/utils/uploadthing";
-import { cn, resolveDurationFromMedia } from "@/lib/utils";
+import { useUploadThing } from "@/utils/uploadthing";
 import { ClientUploadedFileData } from "uploadthing/types";
 import { db } from "@/data/db";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,7 +44,7 @@ export default function RightPanel() {
 
   const { data: jobs = [], isLoading } = useProjectJobs(projectId);
   const setProjectDialogOpen = useVideoProjectStore(
-    (s) => s.setProjectDialogOpen
+    (s) => s.setProjectDialogOpen,
   );
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
 
@@ -52,10 +52,30 @@ export default function RightPanel() {
     openGenerateDialog();
   };
 
+  const { startUpload, isUploading } = useUploadThing("fileUploader");
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    try {
+      const uploadedFiles = await startUpload(Array.from(files));
+      if (uploadedFiles) {
+        await handleUploadComplete(uploadedFiles);
+      }
+    } catch (err) {
+      console.warn(`ERROR! ${err}`);
+      toast({
+        title: "Failed to upload file",
+        description: "Please try again",
+      });
+    }
+  };
+
   const handleUploadComplete = async (
     files: ClientUploadedFileData<{
       uploadedBy: string;
-    }>[]
+    }>[],
   ) => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -165,7 +185,31 @@ export default function RightPanel() {
           <h2 className="text-sm text-muted-foreground font-semibold flex-1">
             Media Gallery
           </h2>
-
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={isUploading}
+            className="cursor-pointer disabled:cursor-default disabled:opacity-50"
+            asChild
+          >
+            <label htmlFor="fileUploadButton">
+              <Input
+                id="fileUploadButton"
+                type="file"
+                className="hidden"
+                onChange={handleFileUpload}
+                multiple={false}
+                disabled={isUploading}
+                accept="image/*,audio/*,video/*"
+              />
+              {isUploading ? (
+                <LoaderCircleIcon className="w-4 h-4 opacity-50 animate-spin" />
+              ) : (
+                <UploadIcon className="w-4 h-4 opacity-50" />
+              )}
+              Upload
+            </label>
+          </Button>
           {jobs.length > 0 && (
             <Button
               variant="secondary"
@@ -193,29 +237,7 @@ export default function RightPanel() {
             </Button>
           </div>
         )}
-        <div className="flex justify-between pt-4 w-full px-4 border-t border-border">
-          <UploadButton
-            appearance={{
-              button: cn([
-                "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium",
-                "transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/20",
-                "disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                "aria-disabled:opacity-50 aria-disabled:pointer-events-none",
-                "h-9 px-4 py-2",
-                "border border-input !bg-background shadow-sm hover:!bg-accent hover:!text-accent-foreground data-[state=open]:bg-accent",
-              ]),
-              allowedContent: "hidden",
-            }}
-            endpoint="fileUploader"
-            onClientUploadComplete={handleUploadComplete}
-            onUploadError={(error: Error) => {
-              console.warn(`ERROR! ${error.message}`);
-              toast({
-                title: "Failed to file upload",
-                description: "Please try again",
-              });
-            }}
-          />
+        <div className="flex justify-end pt-4 w-full px-4 border-t border-border">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="px-2">

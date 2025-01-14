@@ -61,7 +61,7 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
   });
 
   const setProjectDialogOpen = useVideoProjectStore(
-    (s) => s.setProjectDialogOpen
+    (s) => s.setProjectDialogOpen,
   );
   const handleSelectProject = (project: VideoProject) => {
     setProjectId(project.id);
@@ -140,7 +140,7 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
                       onSuccess: (projectId) => {
                         handleSelectProject({ id: projectId } as VideoProject);
                       },
-                    }
+                    },
                   )
                 }
                 disabled={!title.trim() || createProject.isPending}
@@ -183,7 +183,7 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
                     className={cn(
                       "w-full text-left p-3 rounded",
                       "bg-card hover:bg-accent transition-colors",
-                      "border border-border"
+                      "border border-border",
                     )}
                   >
                     <h3 className="font-medium text-sm">{project.title}</h3>
