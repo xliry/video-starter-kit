@@ -117,14 +117,13 @@ const VideoTrackSequence: React.FC<TrackSequenceProps> = ({
         const mediaUrl = resolveMediaUrl(media);
         if (!mediaUrl) return null;
 
-        const fps = media.metadata?.fps || FPS;
         const duration = frame.duration || media.metadata?.duration || 5000;
-        const durationInFrames = Math.floor(duration / (1000 / fps));
+        const durationInFrames = Math.floor(duration / (1000 / FPS));
 
         return (
           <Sequence
             key={frame.id}
-            from={Math.floor(frame.timestamp / (1000 / fps))}
+            from={Math.floor(frame.timestamp / (1000 / FPS))}
             durationInFrames={durationInFrames}
           >
             {media.mediaType === "video" && <Video src={mediaUrl} />}
@@ -151,41 +150,14 @@ const AudioTrackSequence: React.FC<TrackSequenceProps> = ({
         const audioUrl = resolveMediaUrl(media);
         if (!audioUrl) return null;
 
-        const fps = media.metadata?.fps || FPS;
         const duration = frame.duration || media.metadata?.duration || 5000;
-        const durationInFrames = Math.floor(duration / (1000 / fps));
+        const durationInFrames = Math.floor(duration / (1000 / FPS));
 
         return (
           <Sequence
             key={frame.id}
             from={Math.floor(frame.timestamp / (1000 / FPS))}
             durationInFrames={durationInFrames}
-          >
-            <Audio src={audioUrl} />
-          </Sequence>
-        );
-      })}
-    </>
-  );
-};
-
-const VoiceoverTrackSequence: React.FC<TrackSequenceProps> = ({
-  frames,
-  mediaItems,
-}) => {
-  return (
-    <>
-      {frames.map((frame) => {
-        const media = mediaItems[frame.data.mediaId];
-        if (!media || media.status !== "completed") return null;
-
-        const audioUrl = resolveMediaUrl(media);
-        if (!audioUrl) return null;
-
-        return (
-          <Sequence
-            key={frame.id}
-            from={Math.floor(frame.timestamp / (1000 / FPS))}
           >
             <Audio src={audioUrl} />
           </Sequence>

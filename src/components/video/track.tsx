@@ -222,6 +222,9 @@ export function VideoTrackView({
     const handleMouseUp = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.projectPreview(projectId),
+      });
     };
 
     document.addEventListener("mousemove", handleMouseMove);
