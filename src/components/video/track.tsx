@@ -87,23 +87,37 @@ function AudioWaveform({ data }: AudioWaveformProps) {
     placeholderData: keepPreviousData,
     staleTime: Infinity,
   });
+
+  const svgWidth = waveform.length * 2; // 2px per sample
+  const svgHeight = 100; // 100% height
+
   return (
-    <div className="flex flex-row items-center h-full gap-px">
-      {waveform.map((v, index) => {
-        const amplitude = Math.abs(v);
-        const height = Math.max(amplitude * 100, 2);
-        return (
-          <div key={index} className="flex flex-col justify-center h-full">
-            <div
-              className="w-[2px] rounded bg-black/40"
-              style={{
-                height: `${height}%`,
-                minHeight: "2px",
-              }}
+    <div className="h-full">
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+        preserveAspectRatio="none"
+      >
+        {waveform.map((v, index) => {
+          const amplitude = Math.abs(v);
+          const height = Math.max(amplitude * svgHeight, 2);
+          const x = index * 2;
+          const y = (svgHeight - height) / 2;
+
+          return (
+            <rect
+              key={index}
+              x={x}
+              y={y}
+              width="2"
+              height={height}
+              className="fill-black/40"
+              rx="1"
             />
-          </div>
-        );
-      })}
+          );
+        })}
+      </svg>
     </div>
   );
 }
