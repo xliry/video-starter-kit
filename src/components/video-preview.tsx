@@ -125,6 +125,7 @@ const VideoTrackSequence: React.FC<TrackSequenceProps> = ({
             key={frame.id}
             from={Math.floor(frame.timestamp / (1000 / FPS))}
             durationInFrames={durationInFrames}
+            premountFor={3000}
           >
             {media.mediaType === "video" && <Video src={mediaUrl} />}
             {media.mediaType === "image" && (
@@ -158,6 +159,7 @@ const AudioTrackSequence: React.FC<TrackSequenceProps> = ({
             key={frame.id}
             from={Math.floor(frame.timestamp / (1000 / FPS))}
             durationInFrames={durationInFrames}
+            premountFor={3000}
           >
             <Audio src={audioUrl} />
           </Sequence>
