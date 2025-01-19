@@ -191,7 +191,7 @@ export function MediaItemRow({
         )}
       </div>
       <div className="flex flex-col h-full gap-1 flex-1">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start justify-center">
           <h3 className="text-sm font-medium flex flex-row gap-1 items-center">
             {createElement(trackIcons[data.mediaType], {
               className: "w-4 h-4 stroke-1",
@@ -199,6 +199,9 @@ export function MediaItemRow({
             <span>{data.kind === "generated" ? "Job" : "File"}</span>
             <code className="text-muted-foreground">#{mediaId}</code>
           </h3>
+          <p className="opacity-40 text-sm line-clamp-1 ">
+            {data.input?.prompt}
+          </p>
           {data.status !== "completed" && (
             <Badge
               variant="outline"

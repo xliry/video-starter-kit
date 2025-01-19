@@ -329,13 +329,13 @@ export function VideoTrackView({
           },
         )}
       >
-        <div className="px-2 py-0.5 bg-black/10 flex flex-row items-center">
+        <div className="p-0.5 pl-1 bg-black/10 flex flex-row items-center">
           <div className="flex flex-row gap-1 text-sm items-center font-semibold text-white/60 w-full">
             <div className="flex flex-row truncate gap-1 items-center">
               {createElement(trackIcons[track.type], {
-                className: "w-3 h-3 opacity-70 stroke-[3px]",
+                className: "w-5 h-5 stroke-[3px]",
               } as any)}
-              <span className="line-clamp-1 truncate w-full">
+              <span className="line-clamp-1 truncate text-sm mb-[2px] w-full">
                 {media.input?.prompt || label}
               </span>
             </div>
@@ -373,7 +373,10 @@ export function VideoTrackView({
             )}
             onMouseDown={(e) => handleResize(e, "right")}
           >
-            <span>||</span>
+            <span className="flex gap-[1px]">
+              <span className="w-px h-2 rounded bg-white/40"></span>
+              <span className="w-px h-2 rounded bg-white/40"></span>
+            </span>
           </div>
         </div>
       </div>

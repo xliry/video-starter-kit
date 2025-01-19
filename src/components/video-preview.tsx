@@ -13,7 +13,7 @@ import {
   type VideoTrack,
 } from "@/data/schema";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
-import { resolveMediaUrl } from "@/lib/utils";
+import { resolveDuration, resolveMediaUrl } from "@/lib/utils";
 import { Player, type PlayerRef } from "@remotion/player";
 import { preloadVideo, preloadAudio } from "@remotion/preload";
 import { useCallback, useEffect } from "react";
@@ -117,7 +117,7 @@ const VideoTrackSequence: React.FC<TrackSequenceProps> = ({
         const mediaUrl = resolveMediaUrl(media);
         if (!mediaUrl) return null;
 
-        const duration = frame.duration || media.metadata?.duration || 5000;
+        const duration = frame.duration || resolveDuration(media) || 5000;
         const durationInFrames = Math.floor(duration / (1000 / FPS));
 
         return (
@@ -151,7 +151,7 @@ const AudioTrackSequence: React.FC<TrackSequenceProps> = ({
         const audioUrl = resolveMediaUrl(media);
         if (!audioUrl) return null;
 
-        const duration = frame.duration || media.metadata?.duration || 5000;
+        const duration = frame.duration || resolveDuration(media) || 5000;
         const durationInFrames = Math.floor(duration / (1000 / FPS));
 
         return (
@@ -264,6 +264,7 @@ export default function VideoPreview() {
       </Button>
       <div className="w-3/5 aspect-video">
         <Player
+          className="[&_video]:shadow-2xl"
           ref={playerRef}
           component={MainComposition}
           inputProps={{

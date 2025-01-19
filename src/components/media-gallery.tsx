@@ -49,40 +49,10 @@ type AudioPlayerProps = {
 
 function AudioPlayer({ media, ...props }: AudioPlayerProps) {
   const src = resolveMediaUrl(media);
-  if (!src) {
-    return null;
-  }
-  // const data = useAudioData(`/api/download?url=${encodeURIComponent(src)}`);
-  // const duration = resolveDuration(media.input);
-  // const visualization: number[] = useMemo(() => {
-  //   if (data === null || duration === null) {
-  //     return [];
-  //   }
-  //   const totalFrames = (duration / 1000) * 30;
-  //   const buffer: number[] = [];
-  //   for (let i = 0; i < totalFrames; i++) {
-  //     const frame = i / totalFrames;
-  //     const value = visualizeAudio({
-  //       audioData: data,
-  //       frame,
-  //       fps: 30,
-  //       numberOfSamples: 8,
-  //     });
-  //     buffer.push(...value);
-  //   }
-  //   return buffer;
-  // }, [data, duration]);
+  if (!src) return null;
+
   return (
     <div className="flex flex-col gap-4">
-      {/* <div className="flex flex-row items-end">
-        {visualization.map((value, index) => (
-          <div
-            key={index}
-            className="bg-muted-foreground w-px"
-            style={{ height: 1000 * value }}
-          />
-        ))}
-      </div> */}
       <div className="aspect-square bg-accent text-muted-foreground flex flex-col items-center justify-center">
         {media.mediaType === "music" && <MusicIcon className="w-1/2 h-1/2" />}
         {media.mediaType === "voiceover" && <MicIcon className="w-1/2 h-1/2" />}
@@ -177,6 +147,14 @@ export function MediaGallerySheet({
     setSelectedMediaId(null);
   };
 
+  const handleVary = () => {
+    setGenerateMediaType(selectedMedia.mediaType);
+    setEndpointId(selectedMedia.endpointId as string);
+    setGenerateData(selectedMedia.input || {});
+    openGenerateDialog();
+    setSelectedMediaId(null);
+  };
+
   // Event handlers
   const preventClose: MouseEventHandler = (e) => {
     e.preventDefault();
@@ -268,21 +246,23 @@ export function MediaGallerySheet({
             </div>
             <div className="flex flex-row gap-2">
               {selectedMedia?.mediaType === "image" && (
-                <>
-                  <Button
-                    onClick={handleOpenGenerateDialog}
-                    variant="secondary"
-                    disabled={deleteMedia.isPending}
-                  >
-                    <FilmIcon className="w-4 h-4 opacity-50" />
-                    Make Video
-                  </Button>
-                  <Button variant="secondary" disabled={deleteMedia.isPending}>
-                    <ImagesIcon className="w-4 h-4 opacity-50" />
-                    Vary
-                  </Button>
-                </>
+                <Button
+                  onClick={handleOpenGenerateDialog}
+                  variant="secondary"
+                  disabled={deleteMedia.isPending}
+                >
+                  <FilmIcon className="w-4 h-4 opacity-50" />
+                  Make Video
+                </Button>
               )}
+              <Button
+                onClick={handleVary}
+                variant="secondary"
+                disabled={deleteMedia.isPending}
+              >
+                <ImagesIcon className="w-4 h-4 opacity-50" />
+                Vary
+              </Button>
               <Button
                 variant="secondary"
                 disabled={deleteMedia.isPending}

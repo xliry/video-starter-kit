@@ -7,12 +7,7 @@ import {
 import { useProjectId, useVideoProjectStore } from "@/data/store";
 import { cn, resolveDuration } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  type DragEventHandler,
-  type HTMLAttributes,
-  useMemo,
-  useState,
-} from "react";
+import { type DragEventHandler, useMemo, useState } from "react";
 import { VideoControls } from "./video-controls";
 import { TimelineRuler } from "./video/timeline";
 import { VideoTrackRow } from "./video/track";
@@ -67,7 +62,9 @@ export default function BottomBar() {
           },
           { timestamp: 0, duration: 0 },
         );
+
       const duration = resolveDuration(media) ?? 5000;
+
       const newId = await db.keyFrames.create({
         trackId: track.id,
         data: {
@@ -146,8 +143,7 @@ export default function BottomBar() {
 
   return (
     <div className="border-t pb-2 border-border flex flex-col bg-background-light ">
-      <div className="border-b border-border bg-background-dark px-2 flex flex-row gap-8 py-2 justify-center items-center flex-1">
-        <VideoControls />
+      <div className="border-b border-border bg-background-dark px-2 flex flex-row gap-8 py-2 justify-between items-center flex-1">
         <div className="h-full flex flex-col justify-center px-4 bg-muted/50 rounded-md font-mono cursor-default select-none shadow-inner">
           <div className="flex flex-row items-baseline font-thin tabular-nums">
             <span className="text-muted-foreground">00:</span>
@@ -158,6 +154,7 @@ export default function BottomBar() {
             </span>
           </div>
         </div>
+        <VideoControls />
       </div>
       <div
         className={cn(

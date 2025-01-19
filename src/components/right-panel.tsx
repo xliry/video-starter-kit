@@ -15,8 +15,9 @@ import {
   ListPlusIcon,
   MicIcon,
   MusicIcon,
-  UploadIcon,
   LoaderCircleIcon,
+  CloudUploadIcon,
+  SparklesIcon,
 } from "lucide-react";
 import { MediaItemPanel } from "./media-panel";
 import { Button } from "./ui/button";
@@ -189,9 +190,8 @@ export default function RightPanel() {
               {isUploading ? (
                 <LoaderCircleIcon className="w-4 h-4 opacity-50 animate-spin" />
               ) : (
-                <UploadIcon className="w-4 h-4 opacity-50" />
+                <CloudUploadIcon className="w-4 h-4 opacity-50" />
               )}
-              Upload
             </label>
           </Button>
           {mediaItems.length > 0 && (
@@ -200,7 +200,7 @@ export default function RightPanel() {
               size="sm"
               onClick={handleOpenGenerateDialog}
             >
-              <ImagePlusIcon className="w-4 h-4 opacity-50" />
+              <SparklesIcon className="w-4 h-4 opacity-50" />
               Generate...
             </Button>
           )}
