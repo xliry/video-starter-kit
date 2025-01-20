@@ -1,4 +1,3 @@
-// import { useAudioData, visualizeAudio } from "@remotion/media-utils";
 import {
   ComponentProps,
   HTMLAttributes,
@@ -129,12 +128,10 @@ export function MediaGallerySheet({
   const setGenerateMediaType = useVideoProjectStore(
     (s) => s.setGenerateMediaType,
   );
-
-  const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
+  const onGenerate = useVideoProjectStore((s) => s.onGenerate);
 
   const handleOpenGenerateDialog = () => {
     setGenerateMediaType("video");
-    openGenerateDialog();
     const image = selectedMedia.output?.images?.[0]?.url;
 
     const endpoint = AVAILABLE_ENDPOINTS.find(
@@ -143,16 +140,21 @@ export function MediaGallerySheet({
 
     setEndpointId(endpoint?.endpointId ?? AVAILABLE_ENDPOINTS[0].endpointId);
 
-    setGenerateData({ image, duration: undefined });
+    setGenerateData({
+      ...(selectedMedia.input || {}),
+      image,
+      duration: undefined,
+    });
     setSelectedMediaId(null);
+    onGenerate();
   };
 
   const handleVary = () => {
     setGenerateMediaType(selectedMedia.mediaType);
     setEndpointId(selectedMedia.endpointId as string);
     setGenerateData(selectedMedia.input || {});
-    openGenerateDialog();
     setSelectedMediaId(null);
+    onGenerate();
   };
 
   // Event handlers
@@ -261,7 +263,7 @@ export function MediaGallerySheet({
                 disabled={deleteMedia.isPending}
               >
                 <ImagesIcon className="w-4 h-4 opacity-50" />
-                Vary
+                Re-run
               </Button>
               <Button
                 variant="secondary"

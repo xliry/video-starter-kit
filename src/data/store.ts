@@ -50,6 +50,7 @@ interface VideoProjectState extends VideoProjectProps {
   setGenerateData: (generateData: Partial<GenerateData>) => void;
   setExportDialogOpen: (open: boolean) => void;
   setEndpointId: (endpointId: string) => void;
+  onGenerate: () => void;
 }
 
 const DEFAULT_PROPS: VideoProjectProps = {
@@ -103,6 +104,8 @@ export const createVideoProjectStore = (
           voice: "",
         },
       }),
+    // [NOTE]: This is a placeholder function
+    onGenerate: () => {},
     setPlayer: (player: PlayerRef) => set({ player }),
     setPlayerCurrentTimestamp: (playerCurrentTimestamp: number) =>
       set({ playerCurrentTimestamp }),

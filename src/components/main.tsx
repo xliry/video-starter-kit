@@ -17,6 +17,7 @@ import { MediaGallerySheet } from "./media-gallery";
 import { ToastProvider } from "./ui/toast";
 import { Toaster } from "./ui/toaster";
 import { ExportDialog } from "./export-dialog";
+import LeftPanel from "./left-panel";
 
 type AppProps = {
   projectId: string;
@@ -56,6 +57,7 @@ export function App({ projectId }: AppProps) {
           <div className="flex flex-col h-screen bg-background">
             <Header />
             <main className="flex overflow-hidden h-full">
+              <LeftPanel />
               <div className="flex flex-col flex-1">
                 <VideoPreview />
                 <BottomBar />
