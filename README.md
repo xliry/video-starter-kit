@@ -32,6 +32,7 @@ A powerful starting kit for building AI-powered video applications. Built with N
 - [Remotion](https://remotion.dev) - Video processing
 - [IndexedDB](https://developer.mozilla.org/docs/Web/API/IndexedDB_API) - Browser-based storage (no cloud database required)
 - [Vercel](https://vercel.com) - Deployment platform
+- [UploadThing](https://uploadthing.com) - File upload
 
 ## Quick Start
 
