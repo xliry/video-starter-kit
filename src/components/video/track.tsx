@@ -323,9 +323,9 @@ export function VideoTrackView({
         className={cn(
           "flex flex-col select-none rounded overflow-hidden group h-full",
           {
-            "bg-[#2563EB]": track.type === "video",
-            "bg-[#22D3EE]":
-              track.type === "music" || track.type === "voiceover",
+            "bg-sky-600": track.type === "video",
+            "bg-teal-500": track.type === "music",
+            "bg-indigo-500": track.type === "voiceover",
           },
         )}
       >
