@@ -63,6 +63,7 @@ import { WithTooltip } from "./ui/tooltip";
 import { Label } from "./ui/label";
 import { VoiceSelector } from "./playht/voice-selector";
 import { LoadingIcon } from "./ui/icons";
+import { ToggleGroup } from "./ui/toggle-group";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -296,7 +297,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("image")}
               className={cn(
-                mediaType === "image" && "bg-[#1F1F1F]",
+                mediaType === "image" && "bg-white/10",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -307,7 +308,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("video")}
               className={cn(
-                mediaType === "video" && "bg-[#1F1F1F]",
+                mediaType === "video" && "bg-white/10",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -318,7 +319,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("voiceover")}
               className={cn(
-                mediaType === "voiceover" && "bg-[#1F1F1F]",
+                mediaType === "voiceover" && "bg-white/10",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -329,7 +330,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("music")}
               className={cn(
-                mediaType === "music" && "bg-[#1F1F1F]",
+                mediaType === "music" && "bg-white/10",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -339,7 +340,7 @@ export default function RightPanel({
           </div>
           {tab === "generation" && (
             <div className="flex flex-col gap-2 mt-2 justify-start font-medium text-base">
-              <div className="text-[#808080]">Using</div>
+              <div className="text-muted-foreground">Using</div>
               <ModelEndpointPicker
                 mediaType={mediaType}
                 value={endpointId}
@@ -368,7 +369,7 @@ export default function RightPanel({
             {endpoint?.inputAsset?.map((asset, index) => (
               <div key={index} className="flex w-full">
                 <div className="flex flex-col w-full" key={getAssetType(asset)}>
-                  <h4 className="capitalize text-[#808080] mb-2">
+                  <h4 className="capitalize text-muted-foreground mb-2">
                     {getAssetType(asset)} Reference
                   </h4>
                   <Input
