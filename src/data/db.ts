@@ -41,8 +41,8 @@ export const db = {
       const db = await open();
       const tx = db.transaction("projects", "readwrite");
       const result = await tx.store.put({
-        ...project,
         id: crypto.randomUUID(),
+        ...project,
       });
       await tx.done;
       return result;
@@ -71,8 +71,8 @@ export const db = {
     async create(track: Omit<VideoTrack, "id">) {
       const db = await open();
       return db.put("tracks", {
-        ...track,
         id: crypto.randomUUID(),
+        ...track,
       });
     },
   },
@@ -94,8 +94,8 @@ export const db = {
     async create(keyFrame: Omit<VideoKeyFrame, "id">) {
       const db = await open();
       return db.put("keyFrames", {
-        ...keyFrame,
         id: crypto.randomUUID(),
+        ...keyFrame,
       });
     },
     async update(id: string, keyFrame: Partial<VideoKeyFrame>) {
@@ -135,8 +135,8 @@ export const db = {
       const tx = db.transaction("media_items", "readwrite");
       const id = crypto.randomUUID().toString();
       const result = await tx.store.put({
-        ...media,
         id,
+        ...media,
       });
       await tx.done;
       return result;

@@ -1,15 +1,15 @@
 "use client";
 
 import { useProjectCreator } from "@/data/mutations";
-import { useProjects } from "@/data/queries";
+import { queryKeys, useProjects } from "@/data/queries";
 import type { VideoProject } from "@/data/schema";
 import { useVideoProjectStore } from "@/data/store";
 import { useToast } from "@/hooks/use-toast";
 import { createProjectSuggestion } from "@/lib/project";
 import { cn, rememberLastProjectId } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileVideoIcon, FolderOpenIcon, WandSparklesIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "./logo";
 import { Button } from "./ui/button";
 import {
@@ -26,17 +26,28 @@ import { Separator } from "./ui/separator";
 import { Skeleton } from "./ui/skeleton";
 import { Textarea } from "./ui/textarea";
 import { WithTooltip } from "./ui/tooltip";
+import { db } from "@/data/db";
+import { seedDatabase } from "@/data/seed";
 
 type ProjectDialogProps = {} & Parameters<typeof Dialog>[0];
 
 export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
   // Fetch existing projects
-  const { data: projects, isLoading } = useProjects();
+  const { data: projects = [], isLoading } = useProjects();
+
+  // Seed data with template project if empty
+  useEffect(() => {
+    if (projects.length === 0) {
+      seedDatabase().then(() => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.projects });
+      });
+    }
+  }, [projects]);
 
   // Create project mutation
   const setProjectId = useVideoProjectStore((s) => s.setProjectId);
@@ -63,6 +74,7 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
   const setProjectDialogOpen = useVideoProjectStore(
     (s) => s.setProjectDialogOpen,
   );
+
   const handleSelectProject = (project: VideoProject) => {
     setProjectId(project.id);
     setProjectDialogOpen(false);
