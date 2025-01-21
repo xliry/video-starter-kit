@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Video Starting Kit
 
-## Getting Started
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![fal.ai](https://img.shields.io/badge/fal.ai-latest-purple)](https://fal.ai)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
+[![Remotion](https://img.shields.io/badge/Remotion-latest-blue)](https://remotion.dev)
 
-First, run the development server:
+A powerful starting kit for building AI-powered video applications. Built with Next.js, Remotion, and fal.ai, this toolkit simplifies the complexities of working with AI video models in the browser.
 
+## Features
+
+- 🎬 **Browser-Native Video Processing**: Seamless video handling and composition in the browser
+- 🤖 **AI Model Integration**: Direct access to state-of-the-art video models through fal.ai
+  - Minimax for video generation
+  - Hunyuan for visual synthesis
+  - LTX for video manipulation
+- 🎵 **Advanced Media Capabilities**:
+  - Multi-clip video composition
+  - Audio track integration
+  - Voiceover support
+  - Extended video duration handling
+- 🛠️ **Developer Utilities**:
+  - Metadata encoding
+  - Video processing pipeline
+  - Ready-to-use UI components
+  - TypeScript support
+
+## Tech Stack
+
+- [fal.ai](https://fal.ai) - AI model infrastructure
+- [Next.js](https://nextjs.org) - React framework
+- [Remotion](https://remotion.dev) - Video processing
+- [IndexedDB](https://developer.mozilla.org/docs/Web/API/IndexedDB_API) - Browser-based storage (no cloud database required)
+- [Vercel](https://vercel.com) - Deployment platform
+
+## Quick Start
+
+1. Clone the repository:
+```bash
+git clone https://github.com/fal-ai-community/video-starter-kit
+cd video-starter-kit
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Set up your environment variables:
+```bash
+cp .env.example .env.local
+```
+
+4. Start the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for more information.
 
-## Learn More
+## Community
 
-To learn more about Next.js, take a look at the following resources:
+- [Discord](https://discord.gg/fal-ai) - Join our community
+- [GitHub Discussions](https://github.com/fal-ai-community/video-starter-kit/discussions) - For questions and discussions
+- [Twitter](https://twitter.com/fal) - Follow us for updates
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The easiest way to deploy your application is through [Vercel](https://vercel.com/new?utm_source=fal-ai&utm_medium=default-template&utm_campaign=video-starter-kit).

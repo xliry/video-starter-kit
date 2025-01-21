@@ -262,7 +262,7 @@ export default function VideoPreview() {
         <DownloadIcon className="w-4 h-4" />
         Export
       </Button>
-      <div className="w-3/5 aspect-video">
+      <div className="w-full mx-6 aspect-video">
         <Player
           className="[&_video]:shadow-2xl"
           ref={playerRef}
