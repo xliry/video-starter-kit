@@ -192,28 +192,30 @@ export function MediaItemRow({
       </div>
       <div className="flex flex-col h-full gap-1 flex-1">
         <div className="flex flex-col items-start justify-center">
-          <h3 className="text-sm font-medium flex flex-row gap-1 items-center">
-            {createElement(trackIcons[data.mediaType], {
-              className: "w-4 h-4 stroke-1",
-            } as any)}
-            <span>{data.kind === "generated" ? "Job" : "File"}</span>
-            <code className="text-muted-foreground">#{mediaId}</code>
-          </h3>
+          <div className="flex w-full justify-between">
+            <h3 className="text-sm font-medium flex flex-row gap-1 items-center">
+              {createElement(trackIcons[data.mediaType], {
+                className: "w-4 h-4 stroke-1",
+              } as any)}
+              <span>{data.kind === "generated" ? "Job" : "File"}</span>
+              <code className="text-muted-foreground">#{mediaId}</code>
+            </h3>
+            {data.status !== "completed" && (
+              <Badge
+                variant="outline"
+                className={cn({
+                  "text-rose-700": data.status === "failed",
+                  "text-sky-500": data.status === "running",
+                  "text-muted-foreground": data.status === "pending",
+                })}
+              >
+                {data.status}
+              </Badge>
+            )}
+          </div>
           <p className="opacity-40 text-sm line-clamp-1 ">
             {data.input?.prompt}
           </p>
-          {data.status !== "completed" && (
-            <Badge
-              variant="outline"
-              className={cn({
-                "text-rose-700": data.status === "failed",
-                "text-sky-500": data.status === "running",
-                "text-muted-foreground": data.status === "pending",
-              })}
-            >
-              {data.status}
-            </Badge>
-          )}
         </div>
         <div className="flex flex-row gap-2 justify-between">
           <span className="text-xs text-muted-foreground">
