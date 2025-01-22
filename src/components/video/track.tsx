@@ -39,7 +39,7 @@ export function VideoTrackRow({ data, ...props }: VideoTrackRowProps) {
   return (
     <div
       className={cn(
-        "flex flex-row shrink-0 relative w-full timeline-container",
+        "relative w-full timeline-container",
         "flex flex-col select-none rounded overflow-hidden shrink-0",
         {
           "min-h-[64px]": mediaType,
@@ -82,7 +82,6 @@ function AudioWaveform({ data }: AudioWaveformProps) {
             media_url: resolveMediaUrl(data),
             points_per_second: 5,
             precision: 3,
-            // smoothing_window: 5,
           },
         },
       );
@@ -334,7 +333,7 @@ export function VideoTrackView({
           <div className="flex flex-row gap-1 text-sm items-center font-semibold text-white/60 w-full">
             <div className="flex flex-row truncate gap-1 items-center">
               {createElement(trackIcons[track.type], {
-                className: "w-5 h-5 stroke-[3px]",
+                className: "w-5 h-5 opacity-70",
               } as any)}
               <span className="line-clamp-1 truncate text-sm mb-[2px] w-full ">
                 {media.input?.prompt || label}
