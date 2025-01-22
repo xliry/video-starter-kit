@@ -26,7 +26,6 @@ import { Separator } from "./ui/separator";
 import { Skeleton } from "./ui/skeleton";
 import { Textarea } from "./ui/textarea";
 import { WithTooltip } from "./ui/tooltip";
-import { db } from "@/data/db";
 import { seedDatabase } from "@/data/seed";
 
 type ProjectDialogProps = {} & Parameters<typeof Dialog>[0];
@@ -42,12 +41,12 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
 
   // Seed data with template project if empty
   useEffect(() => {
-    if (projects.length === 0) {
+    if (projects.length === 0 && !isLoading) {
       seedDatabase().then(() => {
         queryClient.invalidateQueries({ queryKey: queryKeys.projects });
       });
     }
-  }, [projects]);
+  }, [projects, isLoading]);
 
   // Create project mutation
   const setProjectId = useVideoProjectStore((s) => s.setProjectId);
