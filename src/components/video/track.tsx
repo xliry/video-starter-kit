@@ -5,7 +5,7 @@ import {
   useProjectMediaItems,
 } from "@/data/queries";
 import type { MediaItem, VideoKeyFrame, VideoTrack } from "@/data/schema";
-import { cn, resolveMediaUrl, trackIcons } from "@/lib/utils";
+import { cn, resolveDuration, resolveMediaUrl, trackIcons } from "@/lib/utils";
 import {
   keepPreviousData,
   useMutation,
@@ -40,7 +40,7 @@ export function VideoTrackRow({ data, ...props }: VideoTrackRowProps) {
     <div
       className={cn(
         "flex flex-row shrink-0 relative w-full timeline-container",
-        "flex flex-col select-none rounded overflow-hidden group shrink-0",
+        "flex flex-col select-none rounded overflow-hidden shrink-0",
         {
           "min-h-[64px]": mediaType,
           "min-h-[56px]": !mediaType,
@@ -80,8 +80,9 @@ function AudioWaveform({ data }: AudioWaveformProps) {
         {
           input: {
             media_url: resolveMediaUrl(data),
-            samples_per_second: 48,
+            points_per_second: 5,
             precision: 3,
+            // smoothing_window: 5,
           },
         },
       );
@@ -98,21 +99,21 @@ function AudioWaveform({ data }: AudioWaveformProps) {
     staleTime: Infinity,
   });
 
-  const svgWidth = waveform.length * 2; // 2px per sample
-  const svgHeight = 100; // 100% height
+  const svgWidth = waveform.length * 3;
+  const svgHeight = 100;
 
   return (
-    <div className="h-full">
+    <div className="h-full flex items-center">
       <svg
         width="100%"
-        height="100%"
+        height="80%"
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
         preserveAspectRatio="none"
       >
         {waveform.map((v, index) => {
           const amplitude = Math.abs(v);
           const height = Math.max(amplitude * svgHeight, 2);
-          const x = index * 2;
+          const x = index * 3;
           const y = (svgHeight - height) / 2;
 
           return (
@@ -123,7 +124,7 @@ function AudioWaveform({ data }: AudioWaveformProps) {
               width="2"
               height={height}
               className="fill-black/40"
-              rx="1"
+              rx="4"
             />
           );
         })}
@@ -270,7 +271,7 @@ export function VideoTrackView({
       let newWidth = startWidth + (direction === "right" ? deltaX : -deltaX);
 
       const minDuration = 3000;
-      const maxDuration = (media.metadata?.duration ?? 5) * 1000; // max duration in milliseconds
+      const maxDuration: number = resolveDuration(media) ?? 5000;
 
       const timelineElement = trackElement.closest(".timeline-container");
       const parentWidth = timelineElement
@@ -335,7 +336,7 @@ export function VideoTrackView({
               {createElement(trackIcons[track.type], {
                 className: "w-5 h-5 stroke-[3px]",
               } as any)}
-              <span className="line-clamp-1 truncate text-sm mb-[2px] w-full">
+              <span className="line-clamp-1 truncate text-sm mb-[2px] w-full ">
                 {media.input?.prompt || label}
               </span>
             </div>
@@ -352,7 +353,7 @@ export function VideoTrackView({
           </div>
         </div>
         <div
-          className="p-px flex-1 items-center bg-repeat-x h-full relative"
+          className="p-px flex-1 items-center bg-repeat-x h-full max-h-full overflow-hidden relative"
           style={
             imageUrl
               ? {
@@ -367,7 +368,7 @@ export function VideoTrackView({
           )}
           <div
             className={cn(
-              "absolute right-0 z-50 top-0 bg-black/40",
+              "absolute right-0 z-50 top-0 bg-black/20 group-hover:bg-black/40",
               "rounded-md bottom-0 w-2 m-1 p-px cursor-ew-resize backdrop-blur-md text-white/40",
               "transition-colors flex flex-col items-center justify-center text-xs tracking-tighter",
             )}
