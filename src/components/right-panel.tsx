@@ -338,193 +338,172 @@ export default function RightPanel({
               <span className="text-[10px]">Music</span>
             </Button>
           </div>
-          {tab === "generation" && (
-            <div className="flex flex-col gap-2 mt-2 justify-start font-medium text-base">
-              <div className="text-muted-foreground">Using</div>
-              <ModelEndpointPicker
-                mediaType={mediaType}
-                value={endpointId}
-                onValueChange={(endpoint) => {
-                  resetGenerateData();
-                  setEndpointId(endpoint);
-                }}
-              />
-            </div>
-          )}
-          {tab === "asset" && (
-            <div className="mt-4 flex flex-row gap-2 items-center justify-start font-medium text-base">
-              <Button
-                variant="ghost"
-                onClick={() => setTab("generation")}
-                size="sm"
-              >
-                <ArrowLeft /> Back
-              </Button>
-              <div>Select Asset</div>
-            </div>
-          )}
+          <div className="flex flex-col gap-2 mt-2 justify-start font-medium text-base">
+            <div className="text-muted-foreground">Using</div>
+            <ModelEndpointPicker
+              mediaType={mediaType}
+              value={endpointId}
+              onValueChange={(endpoint) => {
+                resetGenerateData();
+                setEndpointId(endpoint);
+              }}
+            />
+          </div>
         </div>
-        {tab === "generation" && (
-          <div className="flex flex-col gap-2 relative">
-            {endpoint?.inputAsset?.map((asset, index) => (
-              <div key={index} className="flex w-full">
-                <div className="flex flex-col w-full" key={getAssetType(asset)}>
+        <div className="flex flex-col gap-2 relative">
+          {endpoint?.inputAsset?.map((asset, index) => (
+            <div key={index} className="flex w-full">
+              <div className="flex flex-col w-full" key={getAssetType(asset)}>
+                <div className="flex justify-between">
                   <h4 className="capitalize text-muted-foreground mb-2">
                     {getAssetType(asset)} Reference
                   </h4>
-                  <Input
-                    key={getAssetType(asset)}
-                    type="file"
-                    className="hidden"
-                    id={`${asset}-upload`}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setGenerateData({
-                          [getAssetKey(asset) ??
-                            assetKeyMap[getAssetType(asset)]]: file,
-                        });
+                  {tab === "asset" && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => setTab("generation")}
+                      size="sm"
+                    >
+                      <ArrowLeft /> Back
+                    </Button>
+                  )}
+                </div>
+                {tab === "generation" && (
+                  <>
+                    {!generateData[
+                      getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
+                    ] && (
+                      <div className="flex flex-col justify-between">
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            setTab("asset");
+                            setAssetMediaType(getAssetType(asset) ?? "all");
+                          }}
+                          className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
+                        >
+                          <span className="text-muted-foreground text-xs text-center text-nowrap">
+                            Select
+                          </span>
+                        </Button>
+                      </div>
+                    )}
+                    {generateData[
+                      getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
+                    ] && (
+                      <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md">
+                        <WithTooltip tooltip="Remove media">
+                          <button
+                            className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
+                            onClick={() =>
+                              setGenerateData({
+                                [getAssetKey(asset) ??
+                                  assetKeyMap[getAssetType(asset)]]: undefined,
+                              })
+                            }
+                          >
+                            <TrashIcon className="w-3 h-3 stroke-2" />
+                          </button>
+                        </WithTooltip>
+                        {generateData[
+                          getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
+                        ] && (
+                          <SelectedAssetPreview
+                            asset={asset}
+                            data={generateData}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+                {tab === "asset" && (
+                  <div className="flex items-center gap-2 flex-wrap overflow-y-auto max-h-80 divide-y divide-border">
+                    {mediaItems
+                      .filter((media) => {
+                        if (assetMediaType === "all") return true;
+                        if (
+                          assetMediaType === "audio" &&
+                          (media.mediaType === "voiceover" ||
+                            media.mediaType === "music")
+                        )
+                          return true;
+                        return media.mediaType === assetMediaType;
+                      })
+                      .map((job) => (
+                        <MediaItemRow
+                          draggable={false}
+                          key={job.id}
+                          data={job}
+                          onOpen={handleSelectMedia}
+                          className="cursor-pointer"
+                        />
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full  resize-none">
+            <Textarea
+              className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-32 resize-none"
+              placeholder="Imagine..."
+              value={generateData.prompt}
+              rows={3}
+              onChange={(e) => setGenerateData({ prompt: e.target.value })}
+            />
+            <WithTooltip tooltip="Enhance your prompt with AI-powered suggestions.">
+              <div className="absolute bottom-2 right-2">
+                <Button
+                  variant="secondary"
+                  disabled={enhance.isPending}
+                  className="bg-purple-400/10 text-purple-400 text-xs rounded-full h-6 px-3"
+                  onClick={() => enhance.mutate()}
+                >
+                  {enhance.isPending ? (
+                    <LoadingIcon />
+                  ) : (
+                    <WandSparklesIcon className="opacity-50" />
+                  )}
+                  Enhance Prompt
+                </Button>
+              </div>
+            </WithTooltip>
+          </div>
+        </div>
+
+        {tab === "generation" && (
+          <div className="flex flex-col gap-2 mb-2">
+            {mediaType === "music" && endpointId === "fal-ai/playht/tts/v3" && (
+              <div className="flex-1 flex flex-row gap-2">
+                {mediaType === "music" && (
+                  <div className="flex flex-row items-center gap-1">
+                    <Label>Duration</Label>
+                    <Input
+                      className="w-12 text-center tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      min={5}
+                      max={30}
+                      step={1}
+                      type="number"
+                      value={generateData.duration}
+                      onChange={(e) =>
+                        setGenerateData({ duration: parseInt(e.target.value) })
                       }
+                    />
+                    <span>s</span>
+                  </div>
+                )}
+                {endpointId === "fal-ai/playht/tts/v3" && (
+                  <VoiceSelector
+                    value={generateData.voice}
+                    onValueChange={(voice) => {
+                      setGenerateData({ voice });
                     }}
                   />
-                  {!generateData[
-                    getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
-                  ] && (
-                    <div className="flex flex-col min-h-[70px] justify-between">
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setTab("asset");
-                          setAssetMediaType(getAssetType(asset) ?? "all");
-                        }}
-                        className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
-                      >
-                        <span className="text-muted-foreground text-xs text-center text-nowrap">
-                          Select
-                        </span>
-                      </Button>
-                      <label
-                        htmlFor={`${getAssetType(asset)}-upload`}
-                        className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
-                      >
-                        <span className="text-muted-foreground text-xs text-center text-nowrap">
-                          Upload
-                        </span>
-                      </label>
-                    </div>
-                  )}
-                  {generateData[
-                    getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
-                  ] && (
-                    <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md">
-                      <WithTooltip tooltip="Remove media">
-                        <button
-                          className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
-                          onClick={() =>
-                            setGenerateData({
-                              [getAssetKey(asset) ??
-                                assetKeyMap[getAssetType(asset)]]: undefined,
-                            })
-                          }
-                        >
-                          <TrashIcon className="w-3 h-3 stroke-2" />
-                        </button>
-                      </WithTooltip>
-                      {generateData[
-                        getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
-                      ] && (
-                        <SelectedAssetPreview
-                          asset={asset}
-                          data={generateData}
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-            ))}
-            <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full  resize-none">
-              <Textarea
-                className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-32 resize-none"
-                placeholder="Imagine..."
-                value={generateData.prompt}
-                rows={3}
-                onChange={(e) => setGenerateData({ prompt: e.target.value })}
-              />
-              <WithTooltip tooltip="Enhance your prompt with AI-powered suggestions.">
-                <div className="absolute bottom-2 right-2">
-                  <Button
-                    variant="secondary"
-                    disabled={enhance.isPending}
-                    className="bg-purple-400/10 text-purple-400 text-xs rounded-full h-6 px-3"
-                    onClick={() => enhance.mutate()}
-                  >
-                    {enhance.isPending ? (
-                      <LoadingIcon />
-                    ) : (
-                      <WandSparklesIcon className="opacity-50" />
-                    )}
-                    Enhance Prompt
-                  </Button>
-                </div>
-              </WithTooltip>
-            </div>
-          </div>
-        )}
-        {tab === "asset" && (
-          <div className="flex items-center gap-2 flex-wrap overflow-y-auto max-h-80 divide-y divide-border">
-            {mediaItems
-              .filter((media) => {
-                if (assetMediaType === "all") return true;
-                if (
-                  assetMediaType === "audio" &&
-                  (media.mediaType === "voiceover" ||
-                    media.mediaType === "music")
-                )
-                  return true;
-                return media.mediaType === assetMediaType;
-              })
-              .map((job) => (
-                <MediaItemRow
-                  draggable={false}
-                  key={job.id}
-                  data={job}
-                  onOpen={handleSelectMedia}
-                  className="cursor-pointer"
-                />
-              ))}
-          </div>
-        )}
-        {tab === "generation" && (
-          <div className="flex flex-col gap-2">
-            <div className="flex-1 flex flex-row gap-2">
-              {mediaType === "music" && (
-                <div className="flex flex-row items-center gap-1">
-                  <Label>Duration</Label>
-                  <Input
-                    className="w-12 text-center tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    min={5}
-                    max={30}
-                    step={1}
-                    type="number"
-                    value={generateData.duration}
-                    onChange={(e) =>
-                      setGenerateData({ duration: parseInt(e.target.value) })
-                    }
-                  />
-                  <span>s</span>
-                </div>
-              )}
-              {endpointId === "fal-ai/playht/tts/v3" && (
-                <VoiceSelector
-                  value={generateData.voice}
-                  onValueChange={(voice) => {
-                    setGenerateData({ voice });
-                  }}
-                />
-              )}
-            </div>
-            <div className="flex flex-row gap-2 mt-2">
+            )}
+            <div className="flex flex-row gap-2">
               <Button
                 className="w-full"
                 disabled={enhance.isPending || createJob.isPending}
