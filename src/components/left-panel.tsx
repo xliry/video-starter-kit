@@ -4,7 +4,6 @@ import { useProjectUpdater } from "@/data/mutations";
 import { queryKeys, useProject, useProjectMediaItems } from "@/data/queries";
 import { MediaItem, PROJECT_PLACEHOLDER } from "@/data/schema";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
-import { fal } from "@/lib/fal";
 import {
   ChevronDown,
   FilmIcon,
@@ -35,7 +34,7 @@ import { ClientUploadedFileData } from "uploadthing/types";
 import { db } from "@/data/db";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { resolveMediaUrl } from "@/lib/utils";
+import { getMediaMetadata } from "@/lib/ffmpeg";
 
 export default function LeftPanel() {
   const projectId = useProjectId();
@@ -92,19 +91,12 @@ export default function LeftPanel() {
       const media = await db.media.find(mediaId as string);
 
       if (media) {
-        const { data: mediaMetadata } = await fal.subscribe(
-          "drochetti/ffmpeg-api/metadata",
-          {
-            input: {
-              media_url: resolveMediaUrl(media),
-            },
-            mode: "streaming",
-          },
-        );
+        const mediaMetadata = await getMediaMetadata(media as MediaItem);
+
         await db.media
           .update(media.id, {
             ...media,
-            metadata: mediaMetadata.media,
+            metadata: mediaMetadata?.media || {},
           })
           .finally(() => {
             queryClient.invalidateQueries({

@@ -24,6 +24,7 @@ import {
 import { Badge } from "./ui/badge";
 import { LoadingIcon } from "./ui/icons";
 import { useToast } from "@/hooks/use-toast";
+import { getMediaMetadata } from "@/lib/ffmpeg";
 
 type MediaItemRowProps = {
   data: MediaItem;
@@ -58,33 +59,21 @@ export function MediaItemRow({
           queryKey: queryKeys.projectMediaItems(data.projectId),
         });
       }
+      let media: Partial<MediaItem> = {};
+
       if (queueStatus.status === "COMPLETED") {
         try {
           const result = await fal.queue.result(data.endpointId, {
             requestId: data.requestId,
           });
-          const media: MediaItem = {
+          media = {
             ...data,
             output: result.data,
             status: "completed",
           };
+
           await db.media.update(data.id, media);
-          if (media.mediaType !== "image") {
-            const { data: mediaMetadata } = await fal.subscribe(
-              "drochetti/ffmpeg-api/metadata",
-              {
-                input: {
-                  media_url: resolveMediaUrl(media),
-                  extract_frames: true,
-                },
-                mode: "streaming",
-              },
-            );
-            await db.media.update(data.id, {
-              ...media,
-              metadata: mediaMetadata.media,
-            });
-          }
+
           toast({
             title: "Generation completed",
             description: `Your ${data.mediaType} has been generated successfully.`,
@@ -104,6 +93,20 @@ export function MediaItemRow({
           });
         }
       }
+
+      if (media.mediaType !== "image") {
+        const mediaMetadata = await getMediaMetadata(media as MediaItem);
+
+        await db.media.update(data.id, {
+          ...media,
+          metadata: mediaMetadata?.media || {},
+        });
+
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.projectMediaItems(data.projectId),
+        });
+      }
+
       return null;
     },
     enabled: !isDone && data.kind === "generated",
