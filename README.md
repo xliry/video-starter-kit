@@ -7,6 +7,8 @@
 
 A powerful starting kit for building AI-powered video applications. Built with Next.js, Remotion, and fal.ai, this toolkit simplifies the complexities of working with AI video models in the browser.
 
+![AI Video Starting Kit](https://github.com/fal-ai-community/video-starter-kit/blob/main/src/app/opengraph-image.png?raw=true)
+
 ## Features
 
 - 🎬 **Browser-Native Video Processing**: Seamless video handling and composition in the browser
@@ -37,12 +39,14 @@ A powerful starting kit for building AI-powered video applications. Built with N
 ## Quick Start
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/fal-ai-community/video-starter-kit
 cd video-starter-kit
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 # or
@@ -52,11 +56,13 @@ pnpm install
 ```
 
 3. Set up your environment variables:
+
 ```bash
 cp .env.example .env.local
 ```
 
 4. Start the development server:
+
 ```bash
 npm run dev
 # or
