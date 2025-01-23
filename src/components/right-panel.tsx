@@ -31,7 +31,13 @@ import type { ClientUploadedFileData } from "uploadthing/types";
 import { db } from "@/data/db";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { cn, getAssetKey, getAssetType, resolveMediaUrl } from "@/lib/utils";
+import {
+  assetKeyMap,
+  cn,
+  getAssetKey,
+  getAssetType,
+  resolveMediaUrl,
+} from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -77,12 +83,6 @@ function ModelEndpointPicker({
     </Select>
   );
 }
-
-const assetKeyMap: Record<"image" | "video" | "audio", keyof GenerateData> = {
-  image: "image",
-  video: "video_url",
-  audio: "audio_url",
-};
 
 export default function RightPanel({
   onOpenChange,
@@ -264,15 +264,13 @@ export default function RightPanel({
       return;
     }
 
-    const key = getAssetKey(asset) || getAssetType(asset);
-    setGenerateData({ [key]: resolveMediaUrl(media) });
+    setGenerateData({ [getAssetKey(asset)]: resolveMediaUrl(media) });
     setTab("generation");
   };
 
   const { startUpload, isUploading } = useUploadThing("fileUploader");
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log({ e });
     const files = e.target.files;
     if (!files) return;
 
@@ -422,9 +420,7 @@ export default function RightPanel({
                 {(tab === "generation" ||
                   tab !== `asset-${getAssetType(asset)}`) && (
                   <>
-                    {!generateData[
-                      getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
-                    ] && (
+                    {!generateData[getAssetKey(asset)] && (
                       <div className="flex flex-col gap-2 justify-between">
                         <Button
                           variant="ghost"
@@ -466,9 +462,7 @@ export default function RightPanel({
                         </Button>
                       </div>
                     )}
-                    {generateData[
-                      getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
-                    ] && (
+                    {generateData[getAssetKey(asset)] && (
                       <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md">
                         <WithTooltip tooltip="Remove media">
                           <button
@@ -476,17 +470,14 @@ export default function RightPanel({
                             className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
                             onClick={() =>
                               setGenerateData({
-                                [getAssetKey(asset) ??
-                                  assetKeyMap[getAssetType(asset)]]: undefined,
+                                [getAssetKey(asset)]: undefined,
                               })
                             }
                           >
                             <TrashIcon className="w-3 h-3 stroke-2" />
                           </button>
                         </WithTooltip>
-                        {generateData[
-                          getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
-                        ] && (
+                        {generateData[getAssetKey(asset)] && (
                           <SelectedAssetPreview
                             asset={asset}
                             data={generateData}

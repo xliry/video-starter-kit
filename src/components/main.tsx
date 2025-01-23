@@ -11,7 +11,6 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useStore } from "zustand";
-import { GenerateDialog } from "./generate-dialog";
 import { ProjectDialog } from "./project-dialog";
 import { MediaGallerySheet } from "./media-gallery";
 import { ToastProvider } from "./ui/toast";
@@ -67,7 +66,6 @@ export function App({ projectId }: AppProps) {
           </div>
           <Toaster />
           <ProjectDialog open={projectDialogOpen} />
-          <GenerateDialog open={generateDialogOpen} />
           <ExportDialog
             open={isExportDialogOpen}
             onOpenChange={setExportDialogOpen}
