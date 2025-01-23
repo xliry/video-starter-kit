@@ -349,6 +349,7 @@ export default function RightPanel({
           </h2>
           <Button
             variant="ghost"
+            size="icon"
             onClick={() => handleOnOpenChange(false)}
             className="flex items-center gap-2"
           >

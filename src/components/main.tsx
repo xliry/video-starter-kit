@@ -9,7 +9,7 @@ import {
   createVideoProjectStore,
 } from "@/data/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useStore } from "zustand";
 import { ProjectDialog } from "./project-dialog";
 import { MediaGallerySheet } from "./media-gallery";
@@ -17,12 +17,15 @@ import { ToastProvider } from "./ui/toast";
 import { Toaster } from "./ui/toaster";
 import { ExportDialog } from "./export-dialog";
 import LeftPanel from "./left-panel";
+import { KeyDialog } from "./key-dialog";
 
 type AppProps = {
   projectId: string;
 };
 
 export function App({ projectId }: AppProps) {
+  const [keyDialog, setKeyDialog] = useState(false);
+
   const queryClient = useRef(new QueryClient()).current;
   const projectStore = useRef(
     createVideoProjectStore({
@@ -30,10 +33,6 @@ export function App({ projectId }: AppProps) {
     }),
   ).current;
   const projectDialogOpen = useStore(projectStore, (s) => s.projectDialogOpen);
-  const generateDialogOpen = useStore(
-    projectStore,
-    (s) => s.generateDialogOpen,
-  );
   const selectedMediaId = useStore(projectStore, (s) => s.selectedMediaId);
   const setSelectedMediaId = useStore(
     projectStore,
@@ -54,7 +53,7 @@ export function App({ projectId }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <VideoProjectStoreContext.Provider value={projectStore}>
           <div className="flex flex-col h-screen bg-background">
-            <Header />
+            <Header openKeyDialog={() => setKeyDialog(true)} />
             <main className="flex overflow-hidden h-full">
               <LeftPanel />
               <div className="flex flex-col flex-1">
@@ -69,6 +68,10 @@ export function App({ projectId }: AppProps) {
           <ExportDialog
             open={isExportDialogOpen}
             onOpenChange={setExportDialogOpen}
+          />
+          <KeyDialog
+            open={keyDialog}
+            onOpenChange={(open) => setKeyDialog(open)}
           />
           <MediaGallerySheet
             open={selectedMediaId !== null}
