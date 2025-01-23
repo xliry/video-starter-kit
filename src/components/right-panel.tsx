@@ -98,7 +98,7 @@ export default function RightPanel({
     setEndpointId,
   } = videoProjectStore;
 
-  const [tab, setTab] = useState<"generation" | "asset">("generation");
+  const [tab, setTab] = useState<string>("generation");
   const [assetMediaType, setAssetMediaType] = useState("all");
   const projectId = useProjectId();
   const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
@@ -409,7 +409,7 @@ export default function RightPanel({
                   <h4 className="capitalize text-muted-foreground mb-2">
                     {getAssetType(asset)} Reference
                   </h4>
-                  {tab === "asset" && (
+                  {tab === `asset-${getAssetType(asset)}` && (
                     <Button
                       variant="ghost"
                       onClick={() => setTab("generation")}
@@ -419,7 +419,8 @@ export default function RightPanel({
                     </Button>
                   )}
                 </div>
-                {tab === "generation" && (
+                {(tab === "generation" ||
+                  tab !== `asset-${getAssetType(asset)}`) && (
                   <>
                     {!generateData[
                       getAssetKey(asset) ?? assetKeyMap[getAssetType(asset)]
@@ -428,7 +429,7 @@ export default function RightPanel({
                         <Button
                           variant="ghost"
                           onClick={() => {
-                            setTab("asset");
+                            setTab(`asset-${getAssetType(asset)}`);
                             setAssetMediaType(getAssetType(asset) ?? "all");
                           }}
                           className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
@@ -495,7 +496,7 @@ export default function RightPanel({
                     )}
                   </>
                 )}
-                {tab === "asset" && (
+                {tab === `asset-${getAssetType(asset)}` && (
                   <div className="flex items-center gap-2 flex-wrap overflow-y-auto max-h-80 divide-y divide-border">
                     {mediaItems
                       .filter((media) => {
