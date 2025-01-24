@@ -494,7 +494,11 @@ export default function RightPanel({
                           <button
                             type="button"
                             className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
-                            onClick={() => resetGenerateData()}
+                            onClick={() =>
+                              setGenerateData({
+                                [getAssetKey(asset)]: undefined,
+                              })
+                            }
                           >
                             <TrashIcon className="w-3 h-3 stroke-2" />
                           </button>
