@@ -92,19 +92,19 @@ export function MediaItemRow({
             queryKey: queryKeys.projectMediaItems(data.projectId),
           });
         }
-      }
 
-      if (media.mediaType !== "image") {
-        const mediaMetadata = await getMediaMetadata(media as MediaItem);
+        if (media.mediaType !== "image") {
+          const mediaMetadata = await getMediaMetadata(media as MediaItem);
 
-        await db.media.update(data.id, {
-          ...media,
-          metadata: mediaMetadata?.media || {},
-        });
+          await db.media.update(data.id, {
+            ...media,
+            metadata: mediaMetadata?.media || {},
+          });
 
-        await queryClient.invalidateQueries({
-          queryKey: queryKeys.projectMediaItems(data.projectId),
-        });
+          await queryClient.invalidateQueries({
+            queryKey: queryKeys.projectMediaItems(data.projectId),
+          });
+        }
       }
 
       return null;

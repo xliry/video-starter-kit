@@ -1,6 +1,6 @@
 "use client";
 
-import { useJobCreator, useProjectUpdater } from "@/data/mutations";
+import { useJobCreator } from "@/data/mutations";
 import { queryKeys, useProject, useProjectMediaItems } from "@/data/queries";
 import type { MediaItem } from "@/data/schema";
 import {
@@ -38,6 +38,7 @@ import {
   cn,
   getAssetKey,
   getAssetType,
+  mapInputKey,
   resolveMediaUrl,
 } from "@/lib/utils";
 import {
@@ -231,10 +232,12 @@ export default function RightPanel({
         : endpointId,
     mediaType,
     input: {
-      ...input,
+      ...(endpoint?.initialInput || {}),
+      ...mapInputKey(input, endpoint?.inputMap || {}),
       ...extraInput,
     },
   });
+
   const handleOnGenerate = async () => {
     await createJob.mutateAsync({} as any, {
       onSuccess: async () => {
@@ -408,9 +411,16 @@ export default function RightPanel({
             <ModelEndpointPicker
               mediaType={mediaType}
               value={endpointId}
-              onValueChange={(endpoint) => {
+              onValueChange={(endpointId) => {
                 resetGenerateData();
-                setEndpointId(endpoint);
+                setEndpointId(endpointId);
+
+                const endpoint = AVAILABLE_ENDPOINTS.find(
+                  (endpoint) => endpoint.endpointId === endpointId,
+                );
+
+                const initialInput = endpoint?.initialInput || {};
+                setGenerateData({ ...initialInput });
               }}
             />
           </div>
@@ -484,11 +494,7 @@ export default function RightPanel({
                           <button
                             type="button"
                             className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
-                            onClick={() =>
-                              setGenerateData({
-                                [getAssetKey(asset)]: undefined,
-                              })
-                            }
+                            onClick={() => resetGenerateData()}
                           >
                             <TrashIcon className="w-3 h-3 stroke-2" />
                           </button>
