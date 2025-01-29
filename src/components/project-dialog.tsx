@@ -2,7 +2,7 @@
 
 import { useProjectCreator } from "@/data/mutations";
 import { queryKeys, useProjects } from "@/data/queries";
-import type { VideoProject } from "@/data/schema";
+import type { AspectRatio, VideoProject } from "@/data/schema";
 import { useVideoProjectStore } from "@/data/store";
 import { useToast } from "@/hooks/use-toast";
 import { createProjectSuggestion } from "@/lib/project";
@@ -33,6 +33,7 @@ type ProjectDialogProps = {} & Parameters<typeof Dialog>[0];
 export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [aspect, setAspect] = useState<AspectRatio>("16:9");
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -123,8 +124,31 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
                 rows={6}
                 className="resize-none"
               />
+              <div>
+                <h4 className="text-xs text-muted-foreground mb-1">
+                  Aspect Ratio:
+                </h4>
+                <div className="flex flex-row gap-2">
+                  <Button
+                    variant={aspect === "16:9" ? "secondary" : "outline"}
+                    onClick={() => {
+                      setAspect("16:9");
+                    }}
+                  >
+                    16:9
+                  </Button>
+                  <Button
+                    variant={aspect === "9:16" ? "secondary" : "outline"}
+                    onClick={() => {
+                      setAspect("9:16");
+                    }}
+                  >
+                    9:16
+                  </Button>
+                </div>
+              </div>
             </div>
-            <div className="flex-1 flex flex-row items-end justify-center gap-2">
+            <div className="flex-1 flex flex-row items-end justify-start gap-2">
               <WithTooltip tooltip="Out of ideas? Generate a new random project.">
                 <Button
                   variant="secondary"
@@ -145,7 +169,7 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
                     {
                       title,
                       description,
-                      aspectRatio: "16:9",
+                      aspectRatio: aspect,
                     },
                     {
                       onSuccess: (projectId) => {
@@ -189,6 +213,7 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
                 // Project list
                 projects?.map((project) => (
                   <button
+                    type="button"
                     key={project.id}
                     onClick={() => handleSelectProject(project)}
                     className={cn(

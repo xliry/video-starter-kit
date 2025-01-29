@@ -13,7 +13,7 @@ import {
   type VideoTrack,
 } from "@/data/schema";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
-import { resolveDuration, resolveMediaUrl } from "@/lib/utils";
+import { cn, resolveDuration, resolveMediaUrl } from "@/lib/utils";
 import { Player, type PlayerRef } from "@remotion/player";
 import { preloadVideo, preloadAudio } from "@remotion/preload";
 import { useCallback, useEffect } from "react";
@@ -41,6 +41,12 @@ const DEFAULT_DURATION = 5;
 const VIDEO_WIDTH = 1024;
 const VIDEO_HEIGHT = 720;
 
+const videoSizeMap = {
+  "16:9": { width: 1024, height: 576 },
+  "9:16": { width: 576, height: 1024 },
+  "1:1": { width: 1024, height: 1024 },
+};
+
 export const VideoComposition: React.FC<VideoCompositionProps> = ({
   project,
   tracks,
@@ -51,14 +57,25 @@ export const VideoComposition: React.FC<VideoCompositionProps> = ({
     return TRACK_TYPE_ORDER[a.type] - TRACK_TYPE_ORDER[b.type];
   });
 
+  let width = VIDEO_WIDTH;
+  let height = VIDEO_HEIGHT;
+
+  if (project.aspectRatio) {
+    const size = videoSizeMap[project.aspectRatio];
+    if (size) {
+      width = size.width;
+      height = size.height;
+    }
+  }
+
   return (
     <Composition
       id={project.id}
       component={MainComposition as any}
       durationInFrames={DEFAULT_DURATION * FPS}
       fps={FPS}
-      width={VIDEO_WIDTH}
-      height={VIDEO_HEIGHT}
+      width={width}
+      height={height}
       defaultProps={{
         project,
         tracks: sortedTracks,
@@ -253,6 +270,17 @@ export default function VideoPreview() {
     (s) => s.setExportDialogOpen,
   );
 
+  let width = VIDEO_WIDTH;
+  let height = VIDEO_HEIGHT;
+
+  if (project.aspectRatio) {
+    const size = videoSizeMap[project.aspectRatio];
+    if (size) {
+      width = size.width;
+      height = size.height;
+    }
+  }
+
   return (
     <div className="flex-grow flex-1 h-full flex items-center justify-center bg-background-dark dark:bg-background-light relative">
       <Button
@@ -264,9 +292,16 @@ export default function VideoPreview() {
         <DownloadIcon className="w-4 h-4" />
         Export
       </Button>
-      <div className="w-full mx-6 aspect-video max-h-[calc(100vh-25rem)]">
+      <div className="w-full h-full flex items-center justify-center mx-6  max-h-[calc(100vh-25rem)]">
         <Player
-          className="[&_video]:shadow-2xl"
+          className={cn(
+            "[&_video]:shadow-2xl inline-flex items-center justify-center mx-auto w-full h-full max-h-[500px] 3xl:max-h-[800px]",
+            {
+              "aspect-[16/9]": project.aspectRatio === "16:9",
+              "aspect-[9/16]": project.aspectRatio === "9:16",
+              "aspect-[1/1]": project.aspectRatio === "1:1",
+            },
+          )}
           ref={playerRef}
           component={MainComposition}
           inputProps={{
@@ -277,8 +312,8 @@ export default function VideoPreview() {
           }}
           durationInFrames={duration * FPS}
           fps={FPS}
-          compositionWidth={VIDEO_WIDTH}
-          compositionHeight={VIDEO_HEIGHT}
+          compositionWidth={width}
+          compositionHeight={height}
           style={{
             width: "100%",
             height: "100%",

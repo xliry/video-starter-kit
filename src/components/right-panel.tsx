@@ -188,11 +188,25 @@ export default function RightPanel({
     reference_audio_url?: File | string | null;
   };
 
+  const aspectRatioMap = {
+    "16:9": { image: "landscape_16_9", video: "16:9" },
+    "9:16": { image: "portrait_16_9", video: "9:16" },
+    "1:1": { image: "square_1_1", video: "1:1" },
+  };
+
+  let imageAspectRatio: string | { width: number; height: number } | undefined;
+  let videoAspectRatio: string | undefined;
+
+  if (project?.aspectRatio) {
+    imageAspectRatio = aspectRatioMap[project.aspectRatio].image;
+    videoAspectRatio = aspectRatioMap[project.aspectRatio].video;
+  }
+
   const input: InputType = {
     prompt: generateData.prompt,
     image_url: undefined,
-    image_size: mediaType === "image" ? "landscape_16_9" : undefined,
-    aspect_ratio: mediaType === "video" ? "16:9" : undefined,
+    image_size: imageAspectRatio,
+    aspect_ratio: videoAspectRatio,
     seconds_total: generateData.duration ?? undefined,
     voice:
       endpointId === "fal-ai/playht/tts/v3" ? generateData.voice : undefined,
