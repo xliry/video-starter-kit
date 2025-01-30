@@ -52,16 +52,16 @@ export function App({ projectId }: AppProps) {
     <ToastProvider>
       <QueryClientProvider client={queryClient}>
         <VideoProjectStoreContext.Provider value={projectStore}>
-          <div className="flex flex-col h-screen bg-background">
+          <div className="flex flex-col relative overflow-x-hidden h-screen bg-background">
             <Header openKeyDialog={() => setKeyDialog(true)} />
-            <main className="flex overflow-hidden h-full">
+            <main className="flex overflow-hidden h-full w-screen">
               <LeftPanel />
               <div className="flex flex-col flex-1">
                 <VideoPreview />
                 <BottomBar />
               </div>
-              <RightPanel />
             </main>
+            <RightPanel />
           </div>
           <Toaster />
           <ProjectDialog open={projectDialogOpen} />

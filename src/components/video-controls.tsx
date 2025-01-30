@@ -1,4 +1,6 @@
 import { useVideoProjectStore } from "@/data/store";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   ChevronFirstIcon,
   ChevronLastIcon,
@@ -8,6 +10,8 @@ import {
   PlayIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
+
+const FPS = 30;
 
 export function VideoControls() {
   const player = useVideoProjectStore((s) => s.player);
@@ -26,16 +30,23 @@ export function VideoControls() {
   };
   const onSeekToEnd = () => {
     if (!player) return;
-    // player.seekTo(player.);
+    // player.seekTo(player.getDuration());
   };
   const onSeekBackward = () => {
     if (!player) return;
-    // player.seekTo(player.getCurrentTime() - 5);
+    player.pause();
+    player.seekTo(player.getCurrentFrame() - FPS);
   };
   const onSeekForward = () => {
     if (!player) return;
-    // player.seekTo(player.getCurrentTime() + 5);
+    player.seekTo(player.getCurrentFrame() + FPS);
   };
+
+  useHotkeys("space", handleTogglePlay, [player]);
+  useHotkeys("left", onSeekBackward, [player]);
+  useHotkeys("right", onSeekForward, [player]);
+  useHotkeys("home", onSeekToStart, [player]);
+  useHotkeys("end", onSeekToEnd, [player]);
 
   return (
     <div className="flex flex-row justify-center items-center">
