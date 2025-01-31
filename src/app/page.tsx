@@ -8,7 +8,7 @@ export default function IndexPage() {
   return (
     <div className="min-h-screen bg-black text-white relative">
       <Header />
-      <main>
+      <main className="lg:pt-48">
         <Hero />
         <Features />
         <Community />
