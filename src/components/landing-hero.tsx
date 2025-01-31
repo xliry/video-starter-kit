@@ -41,10 +41,12 @@ export default function Hero() {
                 Try it now
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="min-w-[200px]">
-              <Github className="mr-2 h-5 w-5" />
-              Star on GitHub
-            </Button>
+            <Link href="https://github.com/fal-ai-community/video-starter-kit">
+              <Button size="lg" variant="outline" className="min-w-[200px]">
+                <Github className="mr-2 h-5 w-5" />
+                Star on GitHub
+              </Button>
+            </Link>
           </div>
         </div>
 
