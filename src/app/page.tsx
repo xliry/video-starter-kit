@@ -6,16 +6,14 @@ import Footer from "@/components/landing-footer";
 
 export default function IndexPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="relative">
-        <Header />
-        <main>
-          <Hero />
-          <Features />
-          <Community />
-        </main>
-        <Footer />
-      </div>
+    <div className="min-h-screen bg-black text-white relative">
+      <Header />
+      <main>
+        <Hero />
+        <Features />
+        <Community />
+      </main>
+      <Footer />
     </div>
   );
 }
