@@ -3,8 +3,8 @@ import { Analytics } from "@vercel/analytics/react";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Video Studio | Demo by fal.ai",
-  description: "Create and edit videos with AI",
+  title: "AI Video Developer Starter Kit | fal.ai",
+  description: "Open-source AI video editor built for developers.",
 };
 
 export default function RootLayout({
