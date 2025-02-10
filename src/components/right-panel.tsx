@@ -54,6 +54,7 @@ import { Label } from "./ui/label";
 import { VoiceSelector } from "./playht/voice-selector";
 import { LoadingIcon } from "./ui/icons";
 import { getMediaMetadata } from "@/lib/ffmpeg";
+import CameraMovement from "./camera-control";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -186,6 +187,10 @@ export default function RightPanel({
     voice?: string;
     input?: string;
     reference_audio_url?: File | string | null;
+    advanced_camera_control?: {
+      movement_value: number;
+      movement_type: string;
+    };
   };
 
   const aspectRatioMap = {
@@ -225,6 +230,10 @@ export default function RightPanel({
   }
   if (generateData.reference_audio_url) {
     input.reference_audio_url = generateData.reference_audio_url;
+  }
+
+  if (generateData.advanced_camera_control) {
+    input.advanced_camera_control = generateData.advanced_camera_control;
   }
 
   const extraInput =
@@ -584,6 +593,21 @@ export default function RightPanel({
 
         {tab === "generation" && (
           <div className="flex flex-col gap-2 mb-2">
+            {endpoint?.cameraControl && (
+              <CameraMovement
+                value={generateData.advanced_camera_control}
+                onChange={(val) =>
+                  setGenerateData({
+                    advanced_camera_control: val
+                      ? {
+                          movement_value: val.value,
+                          movement_type: val.movement,
+                        }
+                      : undefined,
+                  })
+                }
+              />
+            )}
             {mediaType === "music" && endpointId === "fal-ai/playht/tts/v3" && (
               <div className="flex-1 flex flex-row gap-2">
                 {mediaType === "music" && (
