@@ -123,6 +123,7 @@ export function MediaGallerySheet({
     mediaItems.find((media) => media.id === selectedMediaId) ??
     MEDIA_PLACEHOLDER;
   const setSelectedMediaId = useVideoProjectStore((s) => s.setSelectedMediaId);
+  const openGenerateDialog = useVideoProjectStore((s) => s.openGenerateDialog);
   const setGenerateData = useVideoProjectStore((s) => s.setGenerateData);
   const setEndpointId = useVideoProjectStore((s) => s.setEndpointId);
   const setGenerateMediaType = useVideoProjectStore(
@@ -146,7 +147,7 @@ export function MediaGallerySheet({
       duration: undefined,
     });
     setSelectedMediaId(null);
-    onGenerate();
+    openGenerateDialog();
   };
 
   const handleVary = () => {

@@ -125,7 +125,7 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
         </div>
         <div
           className={cn(
-            "w-full h-[500px] mx-auto",
+            "w-full max-h-[500px] mx-auto max-w-full",
             project?.aspectRatio === "16:9" ? "aspect-[16/9]" : "aspect-[9/16]",
           )}
         >
