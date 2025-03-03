@@ -28,7 +28,16 @@ export default function Header({
           </a>
         </Button>
         {process.env.NEXT_PUBLIC_CUSTOM_KEY && openKeyDialog && (
-          <Button variant="ghost" size="icon" onClick={openKeyDialog}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative"
+            onClick={openKeyDialog}
+          >
+            {typeof localStorage !== "undefined" &&
+              !localStorage?.getItem("falKey") && (
+                <span className="dark:bg-orange-400 bg-orange-600 w-2 h-2 rounded-full absolute top-1 right-1"></span>
+              )}
             <SettingsIcon className="w-6 h-6" />
           </Button>
         )}
