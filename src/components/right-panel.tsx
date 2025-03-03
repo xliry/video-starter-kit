@@ -268,6 +268,13 @@ export default function RightPanel({
           handleOnOpenChange(false);
         }
       },
+      onError: (error) => {
+        console.warn("Failed to create job", error);
+        toast({
+          title: "Failed to generate media",
+          description: "Please ensure you've set your FAL KEY in the settings.",
+        });
+      },
     });
   };
 
