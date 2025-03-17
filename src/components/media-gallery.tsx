@@ -26,6 +26,7 @@ import {
   CopyIcon,
   FilmIcon,
   ImagesIcon,
+  ImageUpscale,
   MicIcon,
   MusicIcon,
   TrashIcon,
@@ -130,6 +131,21 @@ export function MediaGallerySheet({
     (s) => s.setGenerateMediaType,
   );
   const onGenerate = useVideoProjectStore((s) => s.onGenerate);
+
+  const handleUpscaleDialog = () => {
+    setGenerateMediaType("video");
+    const video = selectedMedia.output?.video?.url;
+
+    // video upscale model
+    setEndpointId("fal-ai/topaz/upscale/video");
+
+    setGenerateData({
+      ...(selectedMedia.input || {}),
+      video_url: video,
+    });
+    setSelectedMediaId(null);
+    openGenerateDialog();
+  };
 
   const handleOpenGenerateDialog = () => {
     setGenerateMediaType("video");
@@ -248,6 +264,16 @@ export function MediaGallerySheet({
               <div></div>
             </div>
             <div className="flex flex-row gap-2">
+              {selectedMedia?.mediaType === "video" && (
+                <Button
+                  onClick={handleUpscaleDialog}
+                  variant="secondary"
+                  disabled={deleteMedia.isPending}
+                >
+                  <ImageUpscale className="w-4 h-4 opacity-50" />
+                  Upscale Video
+                </Button>
+              )}
               {selectedMedia?.mediaType === "image" && (
                 <Button
                   onClick={handleOpenGenerateDialog}

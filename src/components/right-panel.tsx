@@ -579,32 +579,34 @@ export default function RightPanel({
               </div>
             </div>
           ))}
-          <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full  resize-none">
-            <Textarea
-              className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-32 resize-none"
-              placeholder="Imagine..."
-              value={generateData.prompt}
-              rows={3}
-              onChange={(e) => setGenerateData({ prompt: e.target.value })}
-            />
-            <WithTooltip tooltip="Enhance your prompt with AI-powered suggestions.">
-              <div className="absolute bottom-2 right-2">
-                <Button
-                  variant="secondary"
-                  disabled={enhance.isPending}
-                  className="bg-purple-400/10 text-purple-400 text-xs rounded-full h-6 px-3"
-                  onClick={() => enhance.mutate()}
-                >
-                  {enhance.isPending ? (
-                    <LoadingIcon />
-                  ) : (
-                    <WandSparklesIcon className="opacity-50" />
-                  )}
-                  Enhance Prompt
-                </Button>
-              </div>
-            </WithTooltip>
-          </div>
+          {endpoint?.prompt !== false && (
+            <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full  resize-none">
+              <Textarea
+                className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-32 resize-none"
+                placeholder="Imagine..."
+                value={generateData.prompt}
+                rows={3}
+                onChange={(e) => setGenerateData({ prompt: e.target.value })}
+              />
+              <WithTooltip tooltip="Enhance your prompt with AI-powered suggestions.">
+                <div className="absolute bottom-2 right-2">
+                  <Button
+                    variant="secondary"
+                    disabled={enhance.isPending}
+                    className="bg-purple-400/10 text-purple-400 text-xs rounded-full h-6 px-3"
+                    onClick={() => enhance.mutate()}
+                  >
+                    {enhance.isPending ? (
+                      <LoadingIcon />
+                    ) : (
+                      <WandSparklesIcon className="opacity-50" />
+                    )}
+                    Enhance Prompt
+                  </Button>
+                </div>
+              </WithTooltip>
+            </div>
+          )}
         </div>
         {tab === "generation" && (
           <div className="flex flex-col gap-2 mb-2">
