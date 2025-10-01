@@ -43,6 +43,7 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
     description: "High quality image generation using WAN 2.2 on RunPod GPU",
     cost: "",
     category: "image",
+    inputAsset: ["image"],
   },
   {
     endpointId: "fal-ai/minimax/video-01-live",
