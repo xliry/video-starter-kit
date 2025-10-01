@@ -56,6 +56,7 @@ import { LoadingIcon } from "./ui/icons";
 import { getMediaMetadata } from "@/lib/ffmpeg";
 import CameraMovement from "./camera-control";
 import VideoFrameSelector from "./video-frame-selector";
+import ReighImageSelector from "./reigh-image-selector";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -621,6 +622,15 @@ export default function RightPanel({
         </div>
         {tab === "generation" && (
           <div className="flex flex-col gap-2 mb-2">
+            {mediaType === "reigh" && (
+              <ReighImageSelector
+                mediaItems={mediaItems}
+                maxImages={8}
+                onChange={(images: (string | File)[]) =>
+                  setGenerateData({ reigh_images: images })
+                }
+              />
+            )}
             {endpoint?.imageForFrame && (
               <VideoFrameSelector
                 mediaItems={mediaItems}
