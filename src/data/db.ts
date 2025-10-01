@@ -120,6 +120,10 @@ export const db = {
       const db = await open();
       return db.get("media_items", id);
     },
+    async findAll(): Promise<MediaItem[]> {
+      const db = await open();
+      return db.getAll("media_items");
+    },
     async mediaByProject(projectId: string): Promise<MediaItem[]> {
       const db = await open();
       const results = await db.getAllFromIndex(

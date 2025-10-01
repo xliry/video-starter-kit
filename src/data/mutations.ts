@@ -90,7 +90,8 @@ export const useJobCreator = ({
     onSuccess: async (data) => {
       if (isComfyUI) {
         // For ComfyUI, update to completed with image URL
-        const media = await db.media.findBy('requestId', data.request_id);
+        const allMedia = await db.media.findAll();
+        const media = allMedia.find(m => m.requestId === data.request_id);
         if (media) {
           await db.media.update(media.id, {
             status: "completed",
