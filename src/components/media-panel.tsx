@@ -47,6 +47,12 @@ export function MediaItemRow({
     queryKey: queryKeys.projectMedia(projectId, data.id),
     queryFn: async () => {
       if (data.kind === "uploaded") return null;
+
+      // Skip fal.ai polling for ComfyUI endpoints
+      if (data.endpointId.startsWith('comfyui/')) {
+        return null;
+      }
+
       const queueStatus = await fal.queue.status(data.endpointId, {
         requestId: data.requestId,
       });
