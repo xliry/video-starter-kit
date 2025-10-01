@@ -1,4 +1,5 @@
 import { fal } from "@/lib/fal";
+import { comfyUIService } from "@/lib/comfyui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { db } from "./db";
 import { queryKeys } from "./queries";
@@ -40,22 +41,65 @@ export const useJobCreator = ({
   input,
 }: JobCreatorParams) => {
   const queryClient = useQueryClient();
+
+  // Check if this is a ComfyUI endpoint
+  const isComfyUI = endpointId.startsWith('comfyui/');
+
   return useMutation({
-    mutationFn: () =>
-      fal.queue.submit(endpointId, {
-        input,
-      }),
-    onSuccess: async (data) => {
-      await db.media.create({
-        projectId,
-        createdAt: Date.now(),
-        mediaType,
-        kind: "generated",
-        endpointId,
-        requestId: data.request_id,
-        status: "pending",
+    mutationFn: async () => {
+      if (isComfyUI) {
+        // Use ComfyUI service directly
+        const imageUrl = await comfyUIService.generateImage(
+          input.prompt || '',
+          input.negative_prompt || '',
+          input.width || 1536,
+          input.height || 1536
+        );
+
+        return {
+          request_id: `comfyui-${Date.now()}`,
+          imageUrl,
+        };
+      }
+
+      // Use fal.ai for other endpoints
+      return fal.queue.submit(endpointId, {
         input,
       });
+    },
+    onSuccess: async (data) => {
+      if (isComfyUI) {
+        // For ComfyUI, immediately create completed media
+        await db.media.create({
+          projectId,
+          createdAt: Date.now(),
+          mediaType,
+          kind: "generated",
+          endpointId,
+          requestId: data.request_id,
+          status: "completed",
+          input,
+          output: {
+            images: [{
+              url: (data as any).imageUrl,
+              width: input.width || 1536,
+              height: input.height || 1536,
+            }]
+          },
+        });
+      } else {
+        // For fal.ai, create pending media
+        await db.media.create({
+          projectId,
+          createdAt: Date.now(),
+          mediaType,
+          kind: "generated",
+          endpointId,
+          requestId: data.request_id,
+          status: "pending",
+          input,
+        });
+      }
 
       await queryClient.invalidateQueries({
         queryKey: queryKeys.projectMediaItems(projectId),
