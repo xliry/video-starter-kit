@@ -23,6 +23,7 @@ import {
   SparklesIcon,
 } from "lucide-react";
 import { MediaItemPanel } from "./media-panel";
+import SegmentProcessing from "./segment-processing";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -120,6 +121,7 @@ export default function LeftPanel() {
 
   return (
     <div className="flex flex-col border-r border-border w-96">
+      <SegmentProcessing />
       <div className="p-4 flex items-center gap-4 border-b border-border">
         <div className="flex w-full">
           <Accordion type="single" collapsible className="w-full">
