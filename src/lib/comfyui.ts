@@ -219,7 +219,7 @@ const WORKFLOW_TEMPLATE = {
   },
   "311": {
     "inputs": {
-      "filename_prefix": "ComfyUI",
+      "filename_prefix": "ComfyUI_PROMPT_ID_",
       "images": [
         "269",
         0
@@ -356,6 +356,9 @@ export class ComfyUIService {
     // Clone the workflow template
     const workflow = JSON.parse(JSON.stringify(WORKFLOW_TEMPLATE));
 
+    // Generate a unique ID for this generation (will be used in filename)
+    const uniqueId = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
     // Update prompt
     workflow["227"].inputs.text = prompt;
     workflow["228"].inputs.text = negativePrompt;
@@ -366,6 +369,9 @@ export class ComfyUIService {
 
     // Generate random seed
     workflow["312"].inputs.seed = this.generateSeed();
+
+    // Set unique filename prefix with the unique ID
+    workflow["311"].inputs.filename_prefix = `ComfyUI_${uniqueId}`;
 
     // Submit prompt
     const response = await fetch(COMFYUI_API_URL, {
@@ -398,13 +404,14 @@ export class ComfyUIService {
     }
 
     // Wait for completion and get the image
-    return this.waitForCompletion(result.prompt_id);
+    // Pass the unique ID so we can find the image by filename if history is lost
+    return this.waitForCompletion(result.prompt_id, uniqueId);
   }
 
   /**
    * Poll for completion and return image URL
    */
-  private async waitForCompletion(promptId: string): Promise<string> {
+  private async waitForCompletion(promptId: string, uniqueId: string): Promise<string> {
     let attempts = 0;
     const maxAttempts = 180; // 3 minutes timeout (1 second interval)
     const checkQueueInterval = 5; // Check queue every 5 attempts
@@ -441,17 +448,16 @@ export class ComfyUIService {
           const queueStatus = await this.checkQueue(promptId);
 
           // If prompt is not in queue and we've waited at least 45 seconds,
-          // assume it completed but history was lost - try to find the image
+          // assume it completed but history was lost - try to find the image by unique ID
           if (!queueStatus.inQueue && attempts >= 45) {
-            console.log('Prompt not in queue and history empty - attempting to find generated image');
+            console.log('Prompt not in queue and history empty - attempting to find generated image by unique ID');
 
-            // Try multiple common filename patterns
+            // Try to find the image using the unique ID we set in the filename
+            // ComfyUI adds _00001_ suffix to filenames
             const possibleFilenames = [
-              `ComfyUI_${promptId.substring(0, 8)}.png`,
-              `ComfyUI_temp_${promptId.substring(0, 8)}.png`,
-              `${promptId}.png`,
-              // Try with incremental numbers (last 5 images)
-              ...Array.from({ length: 5 }, (_, i) => `ComfyUI_${String(i + 1).padStart(5, '0')}_.png`)
+              `ComfyUI_${uniqueId}_00001_.png`,
+              `ComfyUI_${uniqueId}_00002_.png`,
+              `ComfyUI_${uniqueId}_00003_.png`,
             ];
 
             for (const filename of possibleFilenames) {
@@ -477,14 +483,11 @@ export class ComfyUIService {
       attempts++;
     }
 
-    // Final attempt: try common filename patterns
-    console.log('Timeout reached - attempting final image search');
+    // Final attempt: try the unique ID filename one more time
+    console.log('Timeout reached - attempting final image search with unique ID');
     const fallbackFilenames = [
-      'ComfyUI_00001_.png',
-      'ComfyUI_00002_.png',
-      'ComfyUI_00003_.png',
-      'ComfyUI_00004_.png',
-      'ComfyUI_00005_.png',
+      `ComfyUI_${uniqueId}_00001_.png`,
+      `ComfyUI_${uniqueId}_00002_.png`,
     ];
 
     for (const filename of fallbackFilenames) {
@@ -500,7 +503,7 @@ export class ComfyUIService {
       }
     }
 
-    throw new Error('Timeout waiting for image generation - no image found');
+    throw new Error(`Timeout waiting for image generation - no image found with uniqueId: ${uniqueId}`);
   }
 
   /**
