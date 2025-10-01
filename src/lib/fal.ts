@@ -33,30 +33,9 @@ export type ApiInfo = {
 
 export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
   {
-    endpointId: "fal-ai/flux/dev",
-    label: "Flux Dev",
-    description: "Generate a video from a text prompt",
-    cost: "",
-    category: "image",
-  },
-  {
-    endpointId: "fal-ai/flux/schnell",
-    label: "Flux Schnell",
-    description: "Generate a video from a text prompt",
-    cost: "",
-    category: "image",
-  },
-  {
-    endpointId: "fal-ai/flux-pro/v1.1-ultra",
-    label: "Flux Pro 1.1 Ultra",
-    description: "Generate a video from a text prompt",
-    cost: "",
-    category: "image",
-  },
-  {
-    endpointId: "fal-ai/stable-diffusion-v35-large",
-    label: "Stable Diffusion 3.5 Large",
-    description: "Image quality, typography, complex prompt understanding",
+    endpointId: "comfyui/wan2.2",
+    label: "WAN 2.2 (RunPod)",
+    description: "High quality image generation using WAN 2.2 on RunPod GPU",
     cost: "",
     category: "image",
   },
