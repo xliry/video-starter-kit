@@ -82,7 +82,7 @@ export default function BottomBar() {
   const addToTrack = useMutation({
     mutationFn: async (media: MediaItem) => {
       const tracks = await db.tracks.tracksByProject(media.projectId);
-      const trackType = media.mediaType === "image" ? "video" : media.mediaType;
+      const trackType = (media.mediaType === "image" || media.mediaType === "reigh") ? "video" : media.mediaType;
       let track = tracks.find((t) => t.type === trackType);
       if (!track) {
         const id = await db.tracks.create({
