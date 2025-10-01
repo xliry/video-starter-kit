@@ -48,7 +48,27 @@ export const useJobCreator = ({
   return useMutation({
     mutationFn: async () => {
       if (isComfyUI) {
-        // Use ComfyUI service directly
+        // For ComfyUI, create pending media first, then generate
+        const requestId = `comfyui-${Date.now()}`;
+
+        // Create pending media immediately for UI feedback
+        await db.media.create({
+          projectId,
+          createdAt: Date.now(),
+          mediaType,
+          kind: "generated",
+          endpointId,
+          requestId,
+          status: "pending",
+          input,
+        });
+
+        // Invalidate to show loading state
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.projectMediaItems(projectId),
+        });
+
+        // Start generation (this will take time)
         const imageUrl = await comfyUIService.generateImage(
           input.prompt || '',
           input.negative_prompt || '',
@@ -57,7 +77,7 @@ export const useJobCreator = ({
         );
 
         return {
-          request_id: `comfyui-${Date.now()}`,
+          request_id: requestId,
           imageUrl,
         };
       }
@@ -69,24 +89,20 @@ export const useJobCreator = ({
     },
     onSuccess: async (data) => {
       if (isComfyUI) {
-        // For ComfyUI, immediately create completed media
-        await db.media.create({
-          projectId,
-          createdAt: Date.now(),
-          mediaType,
-          kind: "generated",
-          endpointId,
-          requestId: data.request_id,
-          status: "completed",
-          input,
-          output: {
-            images: [{
-              url: (data as any).imageUrl,
-              width: input.width || 1536,
-              height: input.height || 1536,
-            }]
-          },
-        });
+        // For ComfyUI, update to completed with image URL
+        const media = await db.media.findBy('requestId', data.request_id);
+        if (media) {
+          await db.media.update(media.id, {
+            status: "completed",
+            output: {
+              images: [{
+                url: (data as any).imageUrl,
+                width: input.width || 1536,
+                height: input.height || 1536,
+              }]
+            },
+          });
+        }
       } else {
         // For fal.ai, create pending media
         await db.media.create({
@@ -104,6 +120,22 @@ export const useJobCreator = ({
       await queryClient.invalidateQueries({
         queryKey: queryKeys.projectMediaItems(projectId),
       });
+    },
+    onError: async (error) => {
+      if (isComfyUI) {
+        // Mark as failed if generation fails
+        const medias = await db.media.findAll();
+        const media = medias.find(m => m.projectId === projectId && m.status === 'pending' && m.endpointId === endpointId);
+        if (media) {
+          await db.media.update(media.id, {
+            status: "failed",
+          });
+          await queryClient.invalidateQueries({
+            queryKey: queryKeys.projectMediaItems(projectId),
+          });
+        }
+      }
+      console.error('Generation error:', error);
     },
   });
 };
