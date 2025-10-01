@@ -39,13 +39,14 @@ export function mapInputKey(
 }
 
 export const trackIcons: Record<
-  VideoTrack["type"] | "image",
+  VideoTrack["type"] | "image" | "reigh",
   FunctionComponent
 > = {
   video: VideoIcon,
   music: MusicIcon,
   voiceover: MicIcon,
   image: ImageIcon,
+  reigh: ImageIcon,
 };
 
 export function resolveDuration(item: MediaItem): number | null {

@@ -32,7 +32,7 @@ export type ApiInfo = {
   initialInput?: Record<string, unknown>;
   cameraControl?: boolean;
   imageForFrame?: boolean;
-  category: "image" | "video" | "music" | "voiceover";
+  category: "image" | "video" | "music" | "voiceover" | "reigh";
   prompt?: boolean;
 };
 
@@ -43,6 +43,13 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
     description: "High quality image generation using WAN 2.2 on RunPod GPU",
     cost: "",
     category: "image",
+  },
+  {
+    endpointId: "comfyui/reigh",
+    label: "Reigh (RunPod)",
+    description: "Reigh model for advanced generation",
+    cost: "",
+    category: "reigh",
     inputAsset: ["image"],
   },
   {

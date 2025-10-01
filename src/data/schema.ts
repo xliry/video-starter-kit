@@ -72,7 +72,7 @@ export type MediaItem = {
   endpointId?: string;
   requestId?: string;
   projectId: string;
-  mediaType: "image" | "video" | "music" | "voiceover";
+  mediaType: "image" | "video" | "music" | "voiceover" | "reigh";
   status: "pending" | "running" | "completed" | "failed";
   createdAt: number;
   input?: Record<string, any>;

@@ -399,13 +399,13 @@ export default function RightPanel({
           </Button>
         </div>
         <div className="w-full flex flex-col">
-          <div className="flex w-full gap-2">
+          <div className="flex w-full gap-2 flex-wrap">
             <Button
               variant="ghost"
               onClick={() => handleMediaTypeChange("image")}
               className={cn(
                 mediaType === "image" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                "h-14 flex flex-col justify-center flex-1 min-w-[80px] rounded-md gap-2 items-center",
               )}
             >
               <ImageIcon className="w-4 h-4 opacity-50" />
@@ -413,10 +413,21 @@ export default function RightPanel({
             </Button>
             <Button
               variant="ghost"
+              onClick={() => handleMediaTypeChange("reigh")}
+              className={cn(
+                mediaType === "reigh" && "bg-white/10",
+                "h-14 flex flex-col justify-center flex-1 min-w-[80px] rounded-md gap-2 items-center",
+              )}
+            >
+              <ImageIcon className="w-4 h-4 opacity-50" />
+              <span className="text-[10px]">Reigh</span>
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => handleMediaTypeChange("video")}
               className={cn(
                 mediaType === "video" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                "h-14 flex flex-col justify-center flex-1 min-w-[80px] rounded-md gap-2 items-center",
               )}
             >
               <VideoIcon className="w-4 h-4 opacity-50" />
@@ -427,7 +438,7 @@ export default function RightPanel({
               onClick={() => handleMediaTypeChange("voiceover")}
               className={cn(
                 mediaType === "voiceover" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                "h-14 flex flex-col justify-center flex-1 min-w-[80px] rounded-md gap-2 items-center",
               )}
             >
               <MicIcon className="w-4 h-4 opacity-50" />
@@ -438,7 +449,7 @@ export default function RightPanel({
               onClick={() => handleMediaTypeChange("music")}
               className={cn(
                 mediaType === "music" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                "h-14 flex flex-col justify-center flex-1 min-w-[80px] rounded-md gap-2 items-center",
               )}
             >
               <MusicIcon className="w-4 h-4 opacity-50" />

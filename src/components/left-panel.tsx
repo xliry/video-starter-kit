@@ -209,6 +209,13 @@ export default function LeftPanel() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-sm"
+                  onClick={() => setMediaType("reigh")}
+                >
+                  <ImageIcon className="w-4 h-4 opacity-50" />
+                  Reigh
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-sm"
                   onClick={() => setMediaType("music")}
                 >
                   <MusicIcon className="w-4 h-4 opacity-50" />
