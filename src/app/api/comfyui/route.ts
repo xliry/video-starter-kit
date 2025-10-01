@@ -85,6 +85,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(result);
     }
 
+    if (action === 'queue') {
+      // Get queue status
+      const response = await fetch(`${COMFYUI_API_URL}/queue`);
+
+      if (!response.ok) {
+        throw new Error(`ComfyUI API error: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return NextResponse.json(result);
+    }
+
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
     console.error('Proxy error:', error);

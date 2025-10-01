@@ -406,9 +406,11 @@ export class ComfyUIService {
    */
   private async waitForCompletion(promptId: string): Promise<string> {
     let attempts = 0;
-    const maxAttempts = 300; // 5 minutes timeout (1 second interval)
+    const maxAttempts = 180; // 3 minutes timeout (1 second interval)
+    const checkQueueInterval = 5; // Check queue every 5 attempts
 
     while (attempts < maxAttempts) {
+      // First, try to get history
       const history = await this.getHistory(promptId);
 
       if (history && history[promptId]) {
@@ -433,11 +435,72 @@ export class ComfyUIService {
         }
       }
 
+      // Every 5 attempts, check the queue to see if our job finished
+      if (attempts > 0 && attempts % checkQueueInterval === 0) {
+        try {
+          const queueStatus = await this.checkQueue(promptId);
+
+          // If prompt is not in queue and we've waited at least 45 seconds,
+          // assume it completed but history was lost - try to find the image
+          if (!queueStatus.inQueue && attempts >= 45) {
+            console.log('Prompt not in queue and history empty - attempting to find generated image');
+
+            // Try multiple common filename patterns
+            const possibleFilenames = [
+              `ComfyUI_${promptId.substring(0, 8)}.png`,
+              `ComfyUI_temp_${promptId.substring(0, 8)}.png`,
+              `${promptId}.png`,
+              // Try with incremental numbers (last 5 images)
+              ...Array.from({ length: 5 }, (_, i) => `ComfyUI_${String(i + 1).padStart(5, '0')}_.png`)
+            ];
+
+            for (const filename of possibleFilenames) {
+              try {
+                const imageUrl = this.getImageUrl(filename, '', 'output');
+                // Try to fetch the image to verify it exists
+                const testResponse = await fetch(imageUrl, { method: 'HEAD' });
+                if (testResponse.ok) {
+                  console.log(`Found image with filename: ${filename}`);
+                  return imageUrl;
+                }
+              } catch (e) {
+                // Continue trying other filenames
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to check queue:', e);
+        }
+      }
+
       await new Promise(resolve => setTimeout(resolve, 1000));
       attempts++;
     }
 
-    throw new Error('Timeout waiting for image generation');
+    // Final attempt: try common filename patterns
+    console.log('Timeout reached - attempting final image search');
+    const fallbackFilenames = [
+      'ComfyUI_00001_.png',
+      'ComfyUI_00002_.png',
+      'ComfyUI_00003_.png',
+      'ComfyUI_00004_.png',
+      'ComfyUI_00005_.png',
+    ];
+
+    for (const filename of fallbackFilenames) {
+      try {
+        const imageUrl = this.getImageUrl(filename, '', 'output');
+        const testResponse = await fetch(imageUrl, { method: 'HEAD' });
+        if (testResponse.ok) {
+          console.log(`Found image on timeout with filename: ${filename}`);
+          return imageUrl;
+        }
+      } catch (e) {
+        // Continue trying
+      }
+    }
+
+    throw new Error('Timeout waiting for image generation - no image found');
   }
 
   /**
@@ -476,6 +539,50 @@ export class ComfyUIService {
       type,
     });
     return `https://bcsrnjrtebmu0x-8188.proxy.runpod.net/view?${params.toString()}`;
+  }
+
+  /**
+   * Check if a specific prompt is still in the queue
+   */
+  private async checkQueue(promptId: string): Promise<{ inQueue: boolean; position?: number }> {
+    try {
+      const response = await fetch(COMFYUI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'queue',
+        }),
+      });
+
+      if (!response.ok) {
+        return { inQueue: false };
+      }
+
+      const queue = await response.json();
+
+      // Check both running and pending queues
+      const running = queue.queue_running || [];
+      const pending = queue.queue_pending || [];
+
+      for (let i = 0; i < running.length; i++) {
+        if (running[i][1] === promptId) {
+          return { inQueue: true, position: -1 };
+        }
+      }
+
+      for (let i = 0; i < pending.length; i++) {
+        if (pending[i][1] === promptId) {
+          return { inQueue: true, position: i };
+        }
+      }
+
+      return { inQueue: false };
+    } catch (e) {
+      console.error('Error checking queue:', e);
+      return { inQueue: false };
+    }
   }
 
   /**
